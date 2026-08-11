@@ -5,9 +5,8 @@ import generateToken from "../utils/generateToken";
 // ---------------------- SIGNUP ----------------------
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body;
+    const { fullName, email, password } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -16,14 +15,12 @@ export const registerUser = async (req: Request, res: Response) => {
       });
     }
 
-    // Create new user
     const user = await User.create({
-      fullName: name,
+      fullName,   // ✅ FIXED
       email,
-      password, // bcrypt will hash this in pre-save hook
+      password,
     });
 
-    // Generate JWT
     const token = generateToken(user._id);
 
     return res.status(201).json({
@@ -44,6 +41,7 @@ export const registerUser = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 // ---------------------- LOGIN ----------------------
 export const loginUser = async (req: Request, res: Response) => {

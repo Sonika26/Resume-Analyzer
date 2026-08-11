@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Menu, X, FileText, Sparkles } from "lucide-react";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   const links = [
     { name: "Home", href: "#" },
@@ -56,7 +58,8 @@ export default function Navbar() {
 
           {/* Right Side */}
           <div className="hidden  lg:flex gap-5 left-10 space-x-8">
-            <button className="font-medium text-slate-700 hover:text-[#A58ABB] transition">
+            <button className="font-medium text-slate-700 hover:text-[#A58ABB] transition" onClick={()=>{
+              navigate("/login")}}>
               Log In
             </button>
 

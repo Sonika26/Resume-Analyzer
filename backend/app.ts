@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authroutes";
+import resumeRoutes from "./routes/resumeroutes"
 
 
 
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/resume" , resumeRoutes);
 
 // Route
 app.get("/api/message", (req: Request, res: Response) => {

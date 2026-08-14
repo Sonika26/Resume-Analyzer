@@ -4,6 +4,10 @@ import path from "path";
 import Resume from "../models/resume";
 import { extractTextFromPdf } from "../services/pdfservice";
 import { extractTextFromDocx } from "../services/docxservice";
+import { calculateATS } from "../services/ats";
+import { checkGrammar } from "../services/grammar";
+import { checkFormatting } from "../services/formatting";
+import { calculateOverall } from "../services/overall";
 
 export const analyzeResume = async (
   req: Request,
@@ -19,10 +23,7 @@ export const analyzeResume = async (
     }
 
     const filePath = req.file.path;
-
-    const extension = path
-      .extname(req.file.originalname)
-      .toLowerCase();
+    const extension = path.extname(req.file.originalname).toLowerCase();
 
     let extractedText = "";
 
@@ -41,6 +42,7 @@ export const analyzeResume = async (
       });
     }
 
+    // Save resume in DB
     const resume = await Resume.create({
       originalName: req.file.originalname,
       fileName: req.file.filename,
@@ -49,15 +51,24 @@ export const analyzeResume = async (
       extractedText,
     });
 
+    // 🔍 New scoring logic
+    const atsScore = calculateATS(extractedText);
+    const grammarScore = await checkGrammar(extractedText);
+    const formattingScore = checkFormatting(extractedText);
+    const overallScore = calculateOverall(atsScore, grammarScore, formattingScore);
+
     return res.status(201).json({
       success: true,
-      message: "Resume uploaded and text extracted successfully.",
+      message: "Resume analyzed successfully.",
       data: {
         id: resume._id,
         originalName: resume.originalName,
         fileType: resume.fileType,
         fileSize: resume.fileSize,
-        extractedText: resume.extractedText,
+        atsScore,
+        grammarScore,
+        formattingScore,
+        overallScore,
       },
     });
   } catch (error) {

@@ -10,21 +10,12 @@ export interface IResume extends Document {
 
   analysis?: {
     atsScore?: number;
-    summary?: string;
-
-    skills?: string[];
-
-    strengths?: string[];
-
-    weaknesses?: string[];
+    grammarScore?: number;
+    formattingScore?: number;
+    overallScore?: number;
 
     suggestions?: string[];
-
-    experience?: string[];
-
-    education?: string[];
-
-    missingSkills?: string[];
+    source?: string; // "OpenAI" or "Fallback"
   };
 
   createdAt: Date;
@@ -60,53 +51,23 @@ const resumeSchema = new Schema<IResume>(
     },
 
     analysis: {
-      atsScore: {
-        type: Number,
-        min: 0,
-        max: 100,
-      },
-
-      summary: String,
-
-      skills: {
-        type: [String],
-        default: [],
-      },
-
-      strengths: {
-        type: [String],
-        default: [],
-      },
-
-      weaknesses: {
-        type: [String],
-        default: [],
-      },
+      atsScore: { type: Number, min: 0, max: 100 },
+      grammarScore: { type: Number, min: 0, max: 100 },
+      formattingScore: { type: Number, min: 0, max: 100 },
+      overallScore: { type: Number, min: 0, max: 100 },
 
       suggestions: {
         type: [String],
         default: [],
       },
 
-      experience: {
-        type: [String],
-        default: [],
-      },
-
-      education: {
-        type: [String],
-        default: [],
-      },
-
-      missingSkills: {
-        type: [String],
-        default: [],
-      },
-    },
+      source: {
+        type: String,
+        default: "Fallback",
+      }
+    }
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 const Resume = mongoose.model<IResume>("Resume", resumeSchema);

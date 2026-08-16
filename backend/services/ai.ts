@@ -1,3 +1,8 @@
+import dotenv from "dotenv";
+dotenv.config({ path: __dirname + "/../.env" });
+
+
+
 import OpenAI from "openai";
 import { calculateATS } from "./ats";
 import { checkGrammar } from "./grammar";
@@ -26,8 +31,9 @@ export async function analyzeResumeAI(resumeText: string): Promise<any> {
       response_format: { type: "json_object" },
     });
 
-    const output = response.choices[0].message.content;
-    return JSON.parse(output);
+   const output = response.choices[0].message.content ?? "{}";
+return JSON.parse(output);
+
 
   } catch (error) {
     console.error("OpenAI failed, switching to fallbacks:", error);

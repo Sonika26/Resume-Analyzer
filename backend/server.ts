@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
+dotenv.config({ path: __dirname + "/../.env" });
+
+
 import app from "./app";
 import connectDB from "./config/db";
 
-dotenv.config();
 
 // Connect to MongoDB
 connectDB();

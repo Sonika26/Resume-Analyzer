@@ -8,6 +8,7 @@ import { calculateATS } from "../services/ats";
 import { checkGrammar } from "../services/grammar";
 import { checkFormatting } from "../services/formatting";
 import { calculateOverall } from "../services/overall";
+import { analyzeResumeAI } from "../services/ai"; // OpenAI JSON analysis
 
 export const analyzeResume = async (
   req: Request,
@@ -29,10 +30,13 @@ export const analyzeResume = async (
 
     if (extension === ".pdf") {
       extractedText = await extractTextFromPdf(filePath);
-    }
-
-    if (extension === ".docx") {
+    } else if (extension === ".docx") {
       extractedText = await extractTextFromDocx(filePath);
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Unsupported file type",
+      });
     }
 
     if (!extractedText) {
@@ -42,7 +46,6 @@ export const analyzeResume = async (
       });
     }
 
-    // Save resume in DB
     const resume = await Resume.create({
       originalName: req.file.originalname,
       fileName: req.file.filename,
@@ -51,26 +54,58 @@ export const analyzeResume = async (
       extractedText,
     });
 
-    // 🔍 New scoring logic
-    const atsScore = calculateATS(extractedText);
-    const grammarScore = await checkGrammar(extractedText);
-    const formattingScore = checkFormatting(extractedText);
-    const overallScore = calculateOverall(atsScore, grammarScore, formattingScore);
+    // 🔍 Try OpenAI first
+    let result;
+    try {
+      result = await analyzeResumeAI(extractedText);
+      result.source = "OpenAI";
+    } catch (error) {
+      console.error("OpenAI failed, using fallbacks:", error);
 
-    return res.status(201).json({
-      success: true,
-      message: "Resume analyzed successfully.",
-      data: {
-        id: resume._id,
-        originalName: resume.originalName,
-        fileType: resume.fileType,
-        fileSize: resume.fileSize,
+      const atsScore = calculateATS(extractedText);
+      const grammarScore = await checkGrammar(extractedText);
+      const formattingScore = checkFormatting(extractedText);
+      const overallScore = calculateOverall(atsScore, grammarScore, formattingScore);
+
+      result = {
         atsScore,
         grammarScore,
         formattingScore,
         overallScore,
+        suggestions: [
+          "Add a summary section",
+          "Use consistent bullet points",
+          "Highlight measurable achievements",
+          "Reduce passive voice",
+          "Add relevant technical skills",
+        ],
+        source: "Fallback",
+      };
+    }
+
+    // ⭐ SAVE ANALYSIS INTO DATABASE
+    resume.analysis = {
+      atsScore: result.atsScore,
+      grammarScore: result.grammarScore,
+      formattingScore: result.formattingScore,
+      overallScore: result.overallScore,
+      suggestions: result.suggestions,
+      source: result.source,
+    };
+
+    await resume.save();
+
+    
+
+    // ⭐ SEND RESPONSE IN CORRECT STRUCTURE FOR FRONTEND
+    return res.status(201).json({
+      success: true,
+      message: "Resume analyzed successfully.",
+      data: {
+        analysis: resume.analysis,   // ⭐ frontend expects this
       },
     });
+
   } catch (error) {
     next(error);
   }

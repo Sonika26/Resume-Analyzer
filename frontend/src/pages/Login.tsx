@@ -1,4 +1,3 @@
-
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, FileText, ArrowRight } from "lucide-react";
@@ -47,25 +46,18 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F7FB] flex">
+    <div className="min-h-screen bg-[#f7f8fa] flex">
 
       {/* ================= LEFT SECTION ================= */}
 
-    
 
-        {/* Background Decorations */}
-
-
-          {/* Logo */}
-
-          
+      {/* Background Decorations */}
 
 
-          {/* Main Content */}
+      {/* Logo */}
 
-          
-          
 
+      {/* Main Content */}
 
 
       {/* ================= RIGHT SECTION ================= */}
@@ -84,9 +76,9 @@ const Login = () => {
               className="flex items-center gap-3"
             >
 
-              <div className="w-12 h-12 rounded-2xl bg-[#C5B3D3] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center">
 
-                <FileText className="w-6 h-6 text-slate-900" />
+                <FileText className="w-6 h-6 text-white" />
 
               </div>
 
@@ -161,9 +153,9 @@ const Login = () => {
                   placeholder:text-slate-400
                   outline-none
                   transition-all
-                  focus:border-[#C5B3D3]
+                  focus:border-slate-400
                   focus:ring-4
-                  focus:ring-[#C5B3D3]/20
+                  focus:ring-slate-200
                 "
               />
 
@@ -185,7 +177,7 @@ const Login = () => {
 
                 <Link
                   to="/forgot-password"
-                  className="text-sm font-medium text-[#8F6AA8] hover:text-[#76558F] transition"
+                  className="text-sm font-medium text-slate-600 hover:text-slate-900 transition"
                 >
                   Forgot password?
                 </Link>
@@ -216,9 +208,9 @@ const Login = () => {
                     placeholder:text-slate-400
                     outline-none
                     transition-all
-                    focus:border-[#C5B3D3]
+                    focus:border-slate-400
                     focus:ring-4
-                    focus:ring-[#C5B3D3]/20
+                    focus:ring-slate-200
                   "
                 />
 
@@ -271,7 +263,7 @@ const Login = () => {
                     h-4
                     rounded
                     border-slate-300
-                    accent-[#C5B3D3]
+                    accent-slate-700
                   "
                 />
 
@@ -294,8 +286,8 @@ const Login = () => {
                 w-full
                 h-12
                 rounded-xl
-                bg-[#C5B3D3]
-                text-slate-900
+                bg-slate-900
+                text-white
                 font-semibold
                 flex
                 items-center
@@ -304,7 +296,7 @@ const Login = () => {
                 shadow-sm
                 transition-all
                 duration-300
-                hover:bg-[#B8A2C8]
+                hover:bg-slate-800
                 hover:shadow-lg
                 hover:-translate-y-0.5
                 disabled:opacity-60
@@ -315,12 +307,15 @@ const Login = () => {
 
               {loading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-slate-700/30 border-t-slate-700 rounded-full animate-spin" />
+
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
 
                   Signing in...
+
                 </>
               ) : (
                 <>
+
                   Sign in
 
                   <ArrowRight
@@ -331,6 +326,7 @@ const Login = () => {
                       group-hover:translate-x-1
                     "
                   />
+
                 </>
               )}
 
@@ -349,7 +345,7 @@ const Login = () => {
 
             <div className="relative flex justify-center">
 
-              <span className="bg-[#F9F7FB] px-4 text-sm text-slate-400">
+              <span className="bg-[#f7f8fa] px-4 text-sm text-slate-400">
                 New to IntelliResume?
               </span>
 
@@ -367,7 +363,7 @@ const Login = () => {
               h-12
               rounded-xl
               border
-              border-[#C5B3D3]
+              border-slate-200
               bg-white
               text-slate-700
               font-semibold
@@ -375,8 +371,8 @@ const Login = () => {
               items-center
               justify-center
               transition-all
-              hover:bg-[#F5EFF8]
-              hover:border-[#B8A2C8]
+              hover:bg-slate-50
+              hover:border-slate-300
             "
           >
             Create an account
@@ -391,7 +387,7 @@ const Login = () => {
 
             <Link
               to="/terms"
-              className="text-slate-600 hover:text-[#8F6AA8]"
+              className="text-slate-600 hover:text-slate-900"
             >
               Terms of Service
             </Link>
@@ -400,7 +396,7 @@ const Login = () => {
 
             <Link
               to="/privacy"
-              className="text-slate-600 hover:text-[#8F6AA8]"
+              className="text-slate-600 hover:text-slate-900"
             >
               Privacy Policy
             </Link>

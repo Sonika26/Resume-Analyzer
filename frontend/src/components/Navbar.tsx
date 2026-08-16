@@ -23,7 +23,7 @@ export default function Navbar() {
     { name: "Resume Tips", href: "/tips" },
   ];
 
-  const isActive = (href) => {
+  const isActive = (href: string) => {
     if (href === "/") return location.pathname === "/";
     return location.pathname.startsWith(href);
   };
@@ -34,82 +34,127 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 pt-4">
+    <header className="fixed left-0 right-0 top-0 z-50 px-4 pt-4 sm:px-6">
       <div className="mx-auto max-w-7xl">
 
-        {/* Main Navbar */}
+        {/* ================================================== */}
+        {/* MAIN NAVBAR */}
+        {/* ================================================== */}
+
         <div
           className="
             relative
-            flex h-[72px] items-center justify-between
+            flex h-[68px] items-center justify-between
+            overflow-hidden
             rounded-2xl
-            border border-white/70
-            bg-white/80
-            px-4 sm:px-6
-            shadow-[0_8px_35px_rgba(91,70,110,0.08)]
+            border border-slate-200/80
+            bg-white/90
+            px-4
+            shadow-[0_8px_35px_rgba(15,23,42,0.07)]
             backdrop-blur-xl
+            sm:px-6
           "
         >
 
-          {/* Subtle background glow */}
+          {/* Subtle background decoration */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
-            <div className="absolute -left-10 -top-16 h-32 w-32 rounded-full bg-[#C5B3D3]/20 blur-3xl" />
-            <div className="absolute -right-10 -bottom-16 h-32 w-32 rounded-full bg-[#E8DDF0]/30 blur-3xl" />
+            <div className="absolute -left-12 -top-16 h-32 w-32 rounded-full bg-slate-200/40 blur-3xl" />
+
+            <div className="absolute -bottom-16 -right-12 h-32 w-32 rounded-full bg-blue-100/30 blur-3xl" />
           </div>
 
-          {/* ================= LOGO ================= */}
+
+          {/* ================================================== */}
+          {/* LOGO */}
+          {/* ================================================== */}
+
           <Link
             to="/"
-            className="relative z-10 flex items-center gap-3 group"
+            className="group relative z-10 flex items-center gap-3"
           >
+
             {/* Logo Icon */}
             <div className="relative">
 
-              {/* Glow */}
-              <div className="absolute inset-0 rounded-xl bg-[#C5B3D3]/40 blur-lg opacity-60 group-hover:opacity-100 transition-opacity" />
+              {/* Logo glow */}
+              <div
+                className="
+                  absolute inset-0
+                  rounded-xl
+                  bg-slate-400/20
+                  blur-lg
+                  opacity-70
+                  transition-opacity
+                  duration-300
+                  group-hover:opacity-100
+                "
+              />
 
+              {/* Logo box */}
               <div
                 className="
                   relative
-                  flex h-11 w-11 items-center justify-center
+                  flex h-10 w-10
+                  items-center justify-center
                   rounded-xl
-                  bg-gradient-to-br from-[#CDBBDA] to-[#B49BC5]
-                  shadow-[0_5px_15px_rgba(181,156,199,0.3)]
-                  transition-all duration-300
+                  bg-slate-900
+                  shadow-[0_5px_15px_rgba(15,23,42,0.18)]
+                  transition-all
+                  duration-300
                   group-hover:-rotate-3
                   group-hover:scale-105
                 "
               >
-                <FileText className="h-6 w-6 text-white" />
+                <FileText className="h-5 w-5 text-white" />
 
                 <Sparkles
                   className="
                     absolute
                     -right-1.5
                     -top-1.5
-                    h-4 w-4
-                    fill-[#9B78B5]
-                    text-[#9B78B5]
+                    h-3.5
+                    w-3.5
+                    fill-slate-500
+                    text-slate-500
                   "
                 />
               </div>
             </div>
 
+
             {/* Logo Text */}
-            <div className="hidden sm:block leading-none">
-              <div className="text-[20px] font-extrabold tracking-tight">
-                <span className="text-slate-900">Intelli</span>
-                <span className="text-[#B49BC5]">Resume</span>
+            <div className="hidden leading-none sm:block">
+              <div className="text-[19px] font-extrabold tracking-tight">
+                <span className="text-slate-900">
+                  Intelli
+                </span>
+
+                <span className="text-slate-500">
+                  Resume
+                </span>
               </div>
 
-              <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.16em] text-slate-400">
+              <p
+                className="
+                  mt-1
+                  text-[9px]
+                  font-medium
+                  uppercase
+                  tracking-[0.16em]
+                  text-slate-400
+                "
+              >
                 AI Resume Analyzer
               </p>
             </div>
           </Link>
 
-          {/* ================= DESKTOP NAV ================= */}
-          <nav className="relative z-10 hidden lg:flex items-center gap-1">
+
+          {/* ================================================== */}
+          {/* DESKTOP NAVIGATION */}
+          {/* ================================================== */}
+
+          <nav className="relative z-10 hidden items-center gap-1 lg:flex">
 
             {links.map((item) => {
               const active = isActive(item.href);
@@ -121,14 +166,17 @@ export default function Navbar() {
                   className={`
                     relative
                     rounded-xl
-                    px-4 py-2.5
+                    px-4
+                    py-2.5
                     text-sm
                     font-medium
-                    transition-all duration-300
+                    transition-all
+                    duration-300
+
                     ${
                       active
-                        ? "bg-[#F4EFF7] text-[#8F6AA8]"
-                        : "text-slate-600 hover:bg-[#F8F5FA] hover:text-[#8F6AA8]"
+                        ? "bg-slate-100 text-slate-900"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                     }
                   `}
                 >
@@ -136,79 +184,112 @@ export default function Navbar() {
 
                   {/* Active indicator */}
                   {active && (
-                    <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-[#B49BC5]" />
+                    <span
+                      className="
+                        absolute
+                        bottom-1
+                        left-1/2
+                        h-1
+                        w-1
+                        -translate-x-1/2
+                        rounded-full
+                        bg-slate-900
+                      "
+                    />
                   )}
                 </Link>
               );
             })}
+
 
             {/* Dashboard */}
             {isLoggedIn && (
               <Link
                 to="/dashboard"
                 className={`
-                  ml-2 flex items-center gap-1.5
+                  ml-2
+                  flex items-center gap-1.5
                   rounded-xl
                   border
-                  px-4 py-2.5
-                  text-sm font-semibold
-                  transition-all duration-300
+                  px-4
+                  py-2.5
+                  text-sm
+                  font-semibold
+                  transition-all
+                  duration-300
+
                   ${
                     isActive("/dashboard")
-                      ? "border-[#CDBBDA] bg-[#F4EFF7] text-[#8F6AA8]"
-                      : "border-[#E9E1EE] bg-white text-slate-700 hover:border-[#CDBBDA] hover:text-[#8F6AA8]"
+                      ? "border-slate-300 bg-slate-100 text-slate-900"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
                   }
                 `}
               >
                 Dashboard
+
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </Link>
             )}
           </nav>
 
-          {/* ================= RIGHT ACTIONS ================= */}
-          <div className="relative z-10 hidden lg:flex items-center gap-3">
+
+          {/* ================================================== */}
+          {/* RIGHT ACTIONS */}
+          {/* ================================================== */}
+
+          <div className="relative z-10 hidden items-center gap-2.5 lg:flex">
 
             {!isLoggedIn ? (
               <>
+                {/* Login */}
                 <button
                   onClick={() => navigate("/login")}
                   className="
                     rounded-xl
-                    px-4 py-2.5
-                    text-sm font-semibold
+                    px-4
+                    py-2.5
+                    text-sm
+                    font-semibold
                     text-slate-700
-                    transition-all duration-300
-                    hover:bg-[#F8F5FA]
-                    hover:text-[#8F6AA8]
+                    transition-all
+                    duration-300
+                    hover:bg-slate-50
+                    hover:text-slate-900
                   "
                 >
                   Log In
                 </button>
 
+
+                {/* Get Started */}
                 <button
                   onClick={() => navigate("/get-started")}
                   className="
                     group
                     flex items-center gap-2
                     rounded-xl
-                    bg-[#C5B3D3]
-                    px-5 py-2.5
-                    text-sm font-bold
-                    text-slate-900
-                    shadow-[0_6px_18px_rgba(181,156,199,0.25)]
-                    transition-all duration-300
-                    hover:bg-[#B8A2C8]
+                    bg-slate-900
+                    px-5
+                    py-2.5
+                    text-sm
+                    font-bold
+                    text-white
+                    shadow-[0_6px_18px_rgba(15,23,42,0.16)]
+                    transition-all
+                    duration-300
                     hover:-translate-y-0.5
-                    hover:shadow-[0_10px_25px_rgba(181,156,199,0.35)]
+                    hover:bg-slate-800
+                    hover:shadow-[0_10px_25px_rgba(15,23,42,0.22)]
                   "
                 >
                   Get Started
 
                   <ArrowUpRight
                     className="
-                      h-4 w-4
-                      transition-transform duration-300
+                      h-4
+                      w-4
+                      transition-transform
+                      duration-300
                       group-hover:translate-x-0.5
                       group-hover:-translate-y-0.5
                     "
@@ -216,17 +297,22 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
+
+              /* Logout */
               <button
                 onClick={handleLogout}
                 className="
                   flex items-center gap-2
                   rounded-xl
-                  px-4 py-2.5
-                  text-sm font-semibold
-                  text-red-500
-                  transition-all duration-300
-                  hover:bg-red-50
-                  hover:text-red-600
+                  px-4
+                  py-2.5
+                  text-sm
+                  font-semibold
+                  text-slate-500
+                  transition-all
+                  duration-300
+                  hover:bg-slate-50
+                  hover:text-slate-900
                 "
               >
                 <LogOut className="h-4 w-4" />
@@ -235,43 +321,61 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* ================= MOBILE BUTTON ================= */}
+
+          {/* ================================================== */}
+          {/* MOBILE MENU BUTTON */}
+          {/* ================================================== */}
+
           <button
             className="
-              relative z-10
-              flex h-10 w-10
-              items-center justify-center
+              relative
+              z-10
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
               rounded-xl
-              bg-[#F4EFF7]
+              bg-slate-100
               text-slate-700
               transition-all
-              hover:bg-[#EDE4F1]
+              hover:bg-slate-200
               lg:hidden
             "
             onClick={() => setOpen(!open)}
             aria-label="Toggle menu"
           >
-            {open ? <X size={22} /> : <Menu size={22} />}
+            {open ? (
+              <X size={21} />
+            ) : (
+              <Menu size={21} />
+            )}
           </button>
         </div>
 
-        {/* ================= MOBILE MENU ================= */}
+
+        {/* ================================================== */}
+        {/* MOBILE MENU */}
+        {/* ================================================== */}
+
         {open && (
           <div
             className="
               mt-2
               overflow-hidden
               rounded-2xl
-              border border-white/80
+              border border-slate-200
               bg-white/95
               p-3
-              shadow-[0_15px_40px_rgba(91,70,110,0.12)]
+              shadow-[0_15px_40px_rgba(15,23,42,0.10)]
               backdrop-blur-xl
               lg:hidden
             "
           >
+
             <div className="flex flex-col gap-1">
 
+              {/* Navigation links */}
               {links.map((item) => {
                 const active = isActive(item.href);
 
@@ -282,13 +386,16 @@ export default function Navbar() {
                     onClick={() => setOpen(false)}
                     className={`
                       rounded-xl
-                      px-4 py-3.5
-                      text-sm font-semibold
+                      px-4
+                      py-3
+                      text-sm
+                      font-semibold
                       transition-all
+
                       ${
                         active
-                          ? "bg-[#F4EFF7] text-[#8F6AA8]"
-                          : "text-slate-600 hover:bg-[#F8F5FA]"
+                          ? "bg-slate-100 text-slate-900"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                       }
                     `}
                   >
@@ -297,6 +404,8 @@ export default function Navbar() {
                 );
               })}
 
+
+              {/* Dashboard */}
               {isLoggedIn && (
                 <Link
                   to="/dashboard"
@@ -304,46 +413,63 @@ export default function Navbar() {
                   className="
                     mt-1
                     rounded-xl
-                    bg-[#F4EFF7]
-                    px-4 py-3.5
-                    text-sm font-semibold
-                    text-[#8F6AA8]
+                    bg-slate-100
+                    px-4
+                    py-3
+                    text-sm
+                    font-semibold
+                    text-slate-900
                   "
                 >
                   Dashboard
                 </Link>
               )}
 
-              <div className="my-2 h-px bg-[#EEE8F1]" />
 
+              {/* Divider */}
+              <div className="my-2 h-px bg-slate-100" />
+
+
+              {/* Authentication actions */}
               {!isLoggedIn ? (
                 <div className="grid grid-cols-2 gap-2">
 
+                  {/* Login */}
                   <Link
                     to="/login"
                     onClick={() => setOpen(false)}
                     className="
                       rounded-xl
-                      border border-[#E7DFEB]
-                      px-4 py-3
+                      border border-slate-200
+                      px-4
+                      py-3
                       text-center
-                      text-sm font-semibold
+                      text-sm
+                      font-semibold
                       text-slate-700
+                      transition-all
+                      hover:bg-slate-50
                     "
                   >
                     Log In
                   </Link>
 
+
+                  {/* Get Started */}
                   <Link
                     to="/get-started"
                     onClick={() => setOpen(false)}
                     className="
                       rounded-xl
-                      bg-[#C5B3D3]
-                      px-4 py-3
+                      bg-slate-900
+                      px-4
+                      py-3
                       text-center
-                      text-sm font-bold
-                      text-slate-900
+                      text-sm
+                      font-bold
+                      text-white
+                      transition-all
+                      hover:bg-slate-800
                     "
                   >
                     Get Started
@@ -351,15 +477,25 @@ export default function Navbar() {
 
                 </div>
               ) : (
+
+                /* Mobile Logout */
                 <button
                   onClick={handleLogout}
                   className="
-                    flex items-center justify-center gap-2
+                    flex
+                    items-center
+                    justify-center
+                    gap-2
                     rounded-xl
-                    bg-red-50
-                    px-4 py-3
-                    text-sm font-semibold
-                    text-red-500
+                    bg-slate-100
+                    px-4
+                    py-3
+                    text-sm
+                    font-semibold
+                    text-slate-600
+                    transition-all
+                    hover:bg-slate-200
+                    hover:text-slate-900
                   "
                 >
                   <LogOut className="h-4 w-4" />

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import path from "path";
+import mongoose from "mongoose";
 
 import Resume from "../models/resume";
 import { extractTextFromPdf } from "../services/pdfservice";
@@ -10,11 +11,8 @@ import { checkFormatting } from "../services/formatting";
 import { calculateOverall } from "../services/overall";
 import { analyzeResumeAI } from "../services/ai"; // OpenAI JSON analysis
 
-export const analyzeResume = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+// -------------------- Analyze Resume --------------------
+const analyzeResume = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -45,14 +43,16 @@ export const analyzeResume = async (
         message: "Could not extract text from the resume.",
       });
     }
+   const userId = (req.user as any)?._id;
 
     const resume = await Resume.create({
-      originalName: req.file.originalname,
-      fileName: req.file.filename,
-      fileType: req.file.mimetype,
-      fileSize: req.file.size,
-      extractedText,
-    });
+    user: userId,   // 👈 add this line
+  originalName: req.file.originalname,
+  fileName: req.file.filename,
+  fileType: req.file.mimetype,
+  fileSize: req.file.size,
+  extractedText,
+});
 
     // 🔍 Try OpenAI first
     let result;
@@ -95,18 +95,120 @@ export const analyzeResume = async (
 
     await resume.save();
 
-    
-
     // ⭐ SEND RESPONSE IN CORRECT STRUCTURE FOR FRONTEND
     return res.status(201).json({
       success: true,
       message: "Resume analyzed successfully.",
       data: {
-        analysis: resume.analysis,   // ⭐ frontend expects this
+        analysis: resume.analysis,
       },
     });
-
   } catch (error) {
     next(error);
   }
+};
+
+// -------------------- Get All Resumes --------------------
+const getUserResumes = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized.",
+      });
+    }
+
+    const resumes = await Resume.find({ user: req.user._id }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: resumes,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// -------------------- Get Resume By ID --------------------
+const getResumeById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized.",
+      });
+    }
+
+    const { id } = req.params;
+    const resumeId = Array.isArray(id) ? id[0] : id;
+
+    if (!mongoose.Types.ObjectId.isValid(resumeId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid resume ID.",
+      });
+    }
+
+    const resume = await Resume.findOne({ _id: id, user: req.user._id });
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: "Resume not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: resume,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// -------------------- Delete Resume --------------------
+const deleteResume = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized.",
+      });
+    }
+
+    const { id } = req.params;
+    const resumeId = Array.isArray(id) ? id[0] : id;
+
+    if (!mongoose.Types.ObjectId.isValid(resumeId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid resume ID.",
+      });
+    }
+
+    const resume = await Resume.findOneAndDelete({ _id: id, user: req.user._id });
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: "Resume not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Resume deleted successfully.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// -------------------- Export All Controllers --------------------
+export {
+  analyzeResume,
+  getUserResumes,
+  getResumeById,
+  deleteResume,
 };

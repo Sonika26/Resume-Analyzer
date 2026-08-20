@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Scorecards from "../components/Scorecards";
+import api from "../services/dashboard"
 
 import {
   LayoutDashboard,
@@ -33,7 +34,7 @@ interface DashboardResponse {
 const navItems = [
   {
     name: "Dashboard",
-    path: "/",
+    path: "/dashboard",
     icon: LayoutDashboard,
   },
   {
@@ -42,8 +43,8 @@ const navItems = [
     icon: FileText,
   },
   {
-    name: "Job Match",
-    path: "/jobs",
+    name: "Resume",
+    path: "/resume",
     icon: Briefcase,
   },
   {
@@ -88,45 +89,27 @@ useEffect(() => {
 
         const token = localStorage.getItem("token");
 
-        const response = await fetch(
-          "http://localhost:5000/dashboard",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await api.get<DashboardResponse>("/dashboard", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        if (!response.ok) {
-          throw new Error(
-            `Failed to load dashboard: ${response.status}`
-          );
-        }
+        console.log("Latest resume analysis:", response.data);
 
-        const data: DashboardResponse =
-          await response.json();
-
-        console.log("Latest resume analysis:", data);
-
-        if (data.hasResume && data.analysis) {
-          setAnalysis(data.analysis);
+        if (response.data.hasResume && response.data.analysis) {
+          setAnalysis(response.data.analysis);
         } else {
           setAnalysis(null);
         }
-      } catch (error) {
-        console.error("Dashboard error:", error);
-
-        setError(
-          "Unable to load your resume analysis."
-        );
+      } catch (err) {
+        console.error("Dashboard error:", err);
+        setError("Unable to load your resume analysis.");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchLatestAnalysis();
+       fetchLatestAnalysis();
   }, []);
 
   const getStatus = (score: number): string => {

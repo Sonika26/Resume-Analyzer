@@ -18,17 +18,20 @@ const storage = multer.diskStorage({
   },
 });
 
+const allowedTypes = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+
 const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
-  const allowedTypes = [
-    "application/pdf",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ];
-  if (allowedTypes.includes(file.mimetype)) {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (allowedTypes.includes(file.mimetype) || ext === ".pdf" || ext === ".docx") {
     cb(null, true);
   } else {
     cb(new Error("Only PDF and DOCX files are allowed."));
   }
 };
+
 
 export const uploadResume = multer({
   storage,

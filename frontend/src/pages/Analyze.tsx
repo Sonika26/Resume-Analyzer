@@ -2,6 +2,7 @@ import { useState } from "react";
 import ResumeUploader from "../components/ResumeUploader";
 import apiResume from "../services/apiresume";
 
+
 interface Scores {
   atsScore: number;
   grammarScore: number;
@@ -14,6 +15,7 @@ export default function AnalyzeResume() {
   const [resume, setResume] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [scores, setScores] = useState<Scores | null>(null);
+
 
   const handleAnalyze = async () => {
     if (!resume) return;

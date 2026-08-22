@@ -1,1 +1,14 @@
 @import "tailwindcss";
+.main-content {
+  min-height: 100vh;
+  width: calc(100% - 286px);
+  margin-left: 286px;
+}
+
+/* On smaller screens, the sidebar is hidden */
+@media (max-width: 1023px) {
+  .main-content {
+    width: 100%;
+    margin-left: 0;
+  }
+}

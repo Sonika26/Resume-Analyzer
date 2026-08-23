@@ -148,3 +148,38 @@ export const deleteResume = async (
 
   return response.data.message;
 };
+
+/**
+ * Create a new resume.
+ *
+ * This will be connected to the backend
+ * when we implement the resume builder save API.
+ */
+export const createResume = async (data: {
+  title: string;
+  extractedText?: string;
+}): Promise<Resume> => {
+  const response = await axios.post<ResumeResponse>(
+    `${API_URL}/resumes`,
+    data,
+    getAuthHeaders()
+  );
+
+  return response.data.data;
+};
+
+/**
+ * Update an existing resume.
+ */
+export const updateResume = async (
+  resumeId: string,
+  data: Partial<Resume>
+): Promise<Resume> => {
+  const response = await axios.put<ResumeResponse>(
+    `${API_URL}/resumes/${resumeId}`,
+    data,
+    getAuthHeaders()
+  );
+
+  return response.data.data;
+};

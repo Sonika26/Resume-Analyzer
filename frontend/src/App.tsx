@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Analyze from "./pages/Analyze";
 import Resume from "./pages/Resume";
 import Layout from "./components/Layout";
+import ResumeEditor from "./pages/ResumeEditor";
 import "./App.css";
 
 function App() {
@@ -21,6 +22,8 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/analyze" element={<Analyze />} />
         <Route path="/resume" element={<Resume />} />
+         <Route path="/resume/new" element={<ResumeEditor />}/>
+      <Route path="/resume/:id/edit"  element={<ResumeEditor />}/>
       </Route>
     </Routes>
   );

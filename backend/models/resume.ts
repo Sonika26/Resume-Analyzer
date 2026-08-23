@@ -1,19 +1,28 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 
 export interface IResume extends Document {
-  user: mongoose.Types.ObjectId;
+  userId: Types.ObjectId;
 
-  title?: string;
+  title: string;
 
-  originalName: string;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
+  // Uploaded file information
+  originalName?: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
 
-  extractedText: string;
+  // Extracted resume text
+  extractedText?: string;
 
-  // How this resume entered the system
-  source: "upload" | "builder";
+  // Resume Builder data
+  firstName?: string;
+  lastName?: string;
+  jobTitle?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  summary?: string;
+  skills?: string;
 
   analysis?: {
     atsScore?: number;
@@ -22,7 +31,7 @@ export interface IResume extends Document {
     overallScore?: number;
 
     suggestions?: string[];
-    source?: string; // "OpenAI" or "Fallback"
+    source?: string;
   };
 
   createdAt: Date;
@@ -31,50 +40,112 @@ export interface IResume extends Document {
 
 const resumeSchema = new Schema<IResume>(
   {
-    user: {
+    /*
+     * OWNER OF THE RESUME
+     */
+    userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true,
     },
 
+    /*
+     * RESUME TITLE
+     *
+     * Example:
+     * "Frontend Developer Resume"
+     * "React Developer Resume"
+     */
     title: {
       type: String,
+      required: true,
       trim: true,
+      default: "My Resume",
     },
 
+    /*
+     * UPLOADED FILE INFORMATION
+     *
+     * These are optional because a resume can now
+     * also be created directly inside the Resume Builder.
+     */
     originalName: {
       type: String,
-      required: true,
       trim: true,
     },
 
     fileName: {
       type: String,
-      required: true,
     },
 
     fileType: {
       type: String,
-      required: true,
     },
 
     fileSize: {
       type: Number,
-      required: true,
     },
 
+    /*
+     * EXTRACTED TEXT
+     */
     extractedText: {
       type: String,
-      required: true,
     },
 
-    source: {
+    /*
+     * RESUME BUILDER FIELDS
+     */
+    firstName: {
       type: String,
-      enum: ["upload", "builder"],
-      default: "upload",
+      trim: true,
+      default: "",
     },
 
+    lastName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    jobTitle: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    email: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    phone: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    location: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    summary: {
+      type: String,
+      default: "",
+    },
+
+    skills: {
+      type: String,
+      default: "",
+    },
+
+    /*
+     * RESUME ANALYSIS
+     */
     analysis: {
       atsScore: {
         type: Number,

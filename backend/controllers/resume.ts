@@ -12,7 +12,7 @@ import { calculateOverall } from "../services/overall";
 import { analyzeResumeAI } from "../services/ai"; // OpenAI JSON analysis
 
 // -------------------- Analyze Resume --------------------
-const analyzeResume = async (req: Request, res: Response, next: NextFunction) => {
+export const analyzeResume = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -43,15 +43,16 @@ const analyzeResume = async (req: Request, res: Response, next: NextFunction) =>
         message: "Could not extract text from the resume.",
       });
     }
-   const userId = (req.user as any)?._id;
+  
 
     const resume = await Resume.create({
-    user: userId,   // 👈 add this line
-  originalName: req.file.originalname,
-  fileName: req.file.filename,
-  fileType: req.file.mimetype,
-  fileSize: req.file.size,
-  extractedText,
+      userId: req.user!._id,
+      title: req.file.originalname,  // 👈 add this line
+    originalName: req.file.originalname,
+    fileName: req.file.filename,
+    fileType: req.file.mimetype,
+    fileSize: req.file.size,
+    extractedText,
 });
 
     // 🔍 Try OpenAI first
@@ -109,16 +110,19 @@ const analyzeResume = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 // -------------------- Get All Resumes --------------------
-const getUserResumes = async (req: Request, res: Response, next: NextFunction) => {
+export const getUserResumes = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized.",
-      });
-    }
-
-    const resumes = await Resume.find({ user: req.user._id }).sort({ createdAt: -1 });
+    const resumes = await Resume.find({
+      userId: req.user!._id,
+    })
+      .sort({
+        updatedAt: -1,
+      })
+      .select("-extractedText");
 
     return res.status(200).json({
       success: true,
@@ -130,26 +134,16 @@ const getUserResumes = async (req: Request, res: Response, next: NextFunction) =
 };
 
 // -------------------- Get Resume By ID --------------------
-const getResumeById = async (req: Request, res: Response, next: NextFunction) => {
+export const getResumeById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized.",
-      });
-    }
-
-    const { id } = req.params;
-    const resumeId = Array.isArray(id) ? id[0] : id;
-
-    if (!mongoose.Types.ObjectId.isValid(resumeId)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid resume ID.",
-      });
-    }
-
-    const resume = await Resume.findOne({ _id: id, user: req.user._id });
+    const resume = await Resume.findOne({
+      _id: req.params.id,
+      userId: req.user!._id,
+    });
 
     if (!resume) {
       return res.status(404).json({
@@ -166,28 +160,17 @@ const getResumeById = async (req: Request, res: Response, next: NextFunction) =>
     next(error);
   }
 };
-
 // -------------------- Delete Resume --------------------
-const deleteResume = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteResume = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized.",
-      });
-    }
-
-    const { id } = req.params;
-    const resumeId = Array.isArray(id) ? id[0] : id;
-
-    if (!mongoose.Types.ObjectId.isValid(resumeId)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid resume ID.",
-      });
-    }
-
-    const resume = await Resume.findOneAndDelete({ _id: id, user: req.user._id });
+    const resume = await Resume.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user!._id,
+    });
 
     if (!resume) {
       return res.status(404).json({
@@ -206,9 +189,128 @@ const deleteResume = async (req: Request, res: Response, next: NextFunction) => 
 };
 
 // -------------------- Export All Controllers --------------------
-export {
-  analyzeResume,
-  getUserResumes,
-  getResumeById,
-  deleteResume,
+
+export const createResume = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      title,
+      firstName,
+      lastName,
+      jobTitle,
+      email,
+      phone,
+      location,
+      summary,
+      skills,
+    } = req.body;
+
+    const resume = await Resume.create({
+      userId: req.user!._id,
+
+      title: title?.trim() || "My Resume",
+
+      firstName: firstName || "",
+      lastName: lastName || "",
+      jobTitle: jobTitle || "",
+      email: email || "",
+      phone: phone || "",
+      location: location || "",
+      summary: summary || "",
+      skills: skills || "",
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Resume created successfully.",
+      data: resume,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
+
+export const updateResume = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      title,
+      firstName,
+      lastName,
+      jobTitle,
+      email,
+      phone,
+      location,
+      summary,
+      skills,
+    } = req.body;
+
+    const resume = await Resume.findOne({
+      _id: req.params.id,
+      userId: req.user!._id,
+    });
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: "Resume not found.",
+      });
+    }
+
+    /*
+     * Update only fields that were sent.
+     */
+    if (title !== undefined) {
+      resume.title = title.trim();
+    }
+
+    if (firstName !== undefined) {
+      resume.firstName = firstName;
+    }
+
+    if (lastName !== undefined) {
+      resume.lastName = lastName;
+    }
+
+    if (jobTitle !== undefined) {
+      resume.jobTitle = jobTitle;
+    }
+
+    if (email !== undefined) {
+      resume.email = email;
+    }
+
+    if (phone !== undefined) {
+      resume.phone = phone;
+    }
+
+    if (location !== undefined) {
+      resume.location = location;
+    }
+
+    if (summary !== undefined) {
+      resume.summary = summary;
+    }
+
+    if (skills !== undefined) {
+      resume.skills = skills;
+    }
+
+    await resume.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Resume updated successfully.",
+      data: resume,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

@@ -1,0 +1,317 @@
+.resume-editor {
+  min-height: 100vh;
+  background: #f5f5f7;
+}
+
+/* ================= HEADER ================= */
+
+.resume-editor-header {
+  height: 82px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 28px;
+  gap: 24px;
+
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.save-exit-btn {
+  border: 1px solid #e5e7eb;
+  background: white;
+
+  padding: 11px 18px;
+
+  border-radius: 24px;
+
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-exit-btn:hover {
+  background: #f9fafb;
+}
+
+.editor-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  flex: 1;
+}
+
+.editor-title h1 {
+  margin: 0;
+  font-size: 21px;
+}
+
+.saved-status {
+  color: #10b981;
+  font-size: 14px;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.download-btn,
+.save-btn {
+  padding: 11px 20px;
+  border-radius: 22px;
+
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.download-btn {
+  border: 1px solid #e5e7eb;
+  background: white;
+}
+
+.save-btn {
+  border: none;
+  background: #5b4bdb;
+  color: white;
+}
+
+/* ================= BODY ================= */
+
+.resume-editor-body {
+  display: flex;
+  min-height: calc(100vh - 82px);
+}
+
+/* ================= SIDEBAR ================= */
+
+.resume-editor-sidebar {
+  width: 480px;
+  background: white;
+
+  padding: 24px;
+
+  overflow-y: auto;
+
+  border-right: 1px solid #e5e7eb;
+}
+
+.resume-name-section {
+  margin-bottom: 20px;
+}
+
+.resume-title-input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-bottom: 1px solid #d1d5db;
+
+  padding: 12px 4px;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  outline: none;
+}
+
+.resume-title-input:focus {
+  border-color: #5b4bdb;
+}
+
+.editor-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+
+  padding: 18px;
+
+  margin-bottom: 16px;
+}
+
+.editor-section h2 {
+  margin: 0 0 18px;
+
+  font-size: 16px;
+}
+
+.editor-section label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+
+  margin-bottom: 14px;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editor-section input,
+.editor-section textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 8px;
+
+  padding: 11px;
+
+  font-family: inherit;
+
+  outline: none;
+
+  resize: vertical;
+}
+
+.editor-section input:focus,
+.editor-section textarea:focus {
+  border-color: #5b4bdb;
+}
+
+/* ================= PREVIEW ================= */
+
+.resume-preview-area {
+  flex: 1;
+
+  padding: 40px;
+
+  overflow: auto;
+
+  display: flex;
+  justify-content: center;
+
+  background: #f3f4f6;
+}
+
+.resume-paper {
+  background: white;
+
+  width: 794px;
+  min-height: 1123px;
+
+  padding: 60px;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 5px 25px rgba(0, 0, 0, 0.08);
+}
+
+.resume-paper h1 {
+  margin: 0;
+
+  font-size: 32px;
+}
+
+.resume-paper h2 {
+  margin-top: 8px;
+
+  font-size: 18px;
+
+  font-weight: 500;
+
+  color: #4b5563;
+}
+
+.preview-contact {
+  display: flex;
+
+  gap: 16px;
+
+  flex-wrap: wrap;
+
+  color: #6b7280;
+
+  font-size: 13px;
+}
+
+.resume-paper hr {
+  margin: 24px 0;
+
+  border: none;
+
+  border-top: 1px solid #d1d5db;
+}
+
+.resume-paper section {
+  margin-bottom: 28px;
+}
+
+.resume-paper h3 {
+  font-size: 14px;
+
+  letter-spacing: 1px;
+
+  margin-bottom: 10px;
+}
+
+.resume-paper p {
+  line-height: 1.6;
+
+  color: #374151;
+
+  white-space: pre-wrap;
+}
+
+/* ================= LOADING ================= */
+
+.resume-editor-loading {
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  gap: 15px;
+}
+
+.editor-error {
+  color: #dc2626;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 900px) {
+  .resume-editor-header {
+    height: auto;
+
+    padding: 14px;
+
+    flex-wrap: wrap;
+  }
+
+  .editor-title {
+    order: 3;
+
+    width: 100%;
+  }
+
+  .resume-editor-body {
+    flex-direction: column;
+  }
+
+  .resume-editor-sidebar {
+    width: auto;
+
+    border-right: none;
+  }
+
+  .resume-preview-area {
+    padding: 20px;
+  }
+
+  .resume-paper {
+    width: 100%;
+    min-height: auto;
+
+    padding: 30px;
+  }
+}

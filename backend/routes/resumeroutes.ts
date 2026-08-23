@@ -1,40 +1,25 @@
 import { Router } from "express";
 
-
 import {
   analyzeResume,
+  createResume,
   getUserResumes,
   getResumeById,
+  updateResume,
   deleteResume,
 } from "../controllers/resume";
 
 import { uploadResume } from "../middlewares/uploadmiddleware";
+
 import protect from "../middlewares/authmiddleware";
 
 const router = Router();
 
-// ============================================================
-// GET ALL RESUMES FOR LOGGED-IN USER
-// ============================================================
-
-router.get(
-  "/",
-  protect,
-  getUserResumes
-);
-
-// ============================================================
-// GET ONE RESUME
-// ============================================================
-
-router.get(
-  "/:id",
-  protect,
-  getResumeById
-);
-
-// ANALYZE + SAVE UPLOADED RESUME
-
+/*
+ * ==========================================
+ * RESUME ANALYSIS
+ * ==========================================
+ */
 
 router.post(
   "/analyze",
@@ -43,10 +28,61 @@ router.post(
   analyzeResume
 );
 
+/*
+ * ==========================================
+ * RESUME BUILDER
+ * ==========================================
+ */
 
-// DELETE RESUME
+/*
+ * Create a new resume
+ *
+ * POST /api/resumes
+ */
+router.post(
+  "/",
+  protect,
+  createResume
+);
 
+/*
+ * Get all resumes belonging to logged-in user
+ *
+ * GET /api/resumes
+ */
+router.get(
+  "/",
+  protect,
+  getUserResumes
+);
 
+/*
+ * Get one resume
+ *
+ * GET /api/resumes/:id
+ */
+router.get(
+  "/:id",
+  protect,
+  getResumeById
+);
+
+/*
+ * Update one resume
+ *
+ * PUT /api/resumes/:id
+ */
+router.put(
+  "/:id",
+  protect,
+  updateResume
+);
+
+/*
+ * Delete one resume
+ *
+ * DELETE /api/resumes/:id
+ */
 router.delete(
   "/:id",
   protect,

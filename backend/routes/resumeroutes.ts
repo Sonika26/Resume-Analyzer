@@ -2,24 +2,16 @@ import { Router } from "express";
 
 import {
   analyzeResume,
-  createResume,
-  getUserResumes,
   getResumeById,
   updateResume,
   deleteResume,
+  downloadResumePdf,
 } from "../controllers/resume";
 
 import { uploadResume } from "../middlewares/uploadmiddleware";
-
 import protect from "../middlewares/authmiddleware";
 
 const router = Router();
-
-/*
- * ==========================================
- * RESUME ANALYSIS
- * ==========================================
- */
 
 router.post(
   "/analyze",
@@ -29,60 +21,26 @@ router.post(
 );
 
 /*
- * ==========================================
- * RESUME BUILDER
- * ==========================================
- */
-
-/*
- * Create a new resume
- *
- * POST /api/resumes
- */
-router.post(
-  "/",
-  protect,
-  createResume
-);
-
-/*
- * Get all resumes belonging to logged-in user
- *
- * GET /api/resumes
+ * Download MUST come before /:id
  */
 router.get(
-  "/",
+  "/:id/download",
   protect,
-  getUserResumes
+  downloadResumePdf
 );
 
-/*
- * Get one resume
- *
- * GET /api/resumes/:id
- */
 router.get(
   "/:id",
   protect,
   getResumeById
 );
 
-/*
- * Update one resume
- *
- * PUT /api/resumes/:id
- */
 router.put(
   "/:id",
   protect,
   updateResume
 );
 
-/*
- * Delete one resume
- *
- * DELETE /api/resumes/:id
- */
 router.delete(
   "/:id",
   protect,

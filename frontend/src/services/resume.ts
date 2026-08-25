@@ -8,18 +8,26 @@ const API_URL =
  */
 export interface Resume {
   _id: string;
-  user: string;
+  userId: string;
 
-  title?: string;
+  title: string;
 
-  originalName: string;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
+  originalName?: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
 
   extractedText?: string;
 
-  source: "upload" | "builder";
+  // Resume Builder fields
+  firstName?: string;
+  lastName?: string;
+  jobTitle?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  summary?: string;
+  skills?: string;
 
   analysis?: {
     atsScore?: number;
@@ -160,7 +168,7 @@ export const createResume = async (data: {
   extractedText?: string;
 }): Promise<Resume> => {
   const response = await axios.post<ResumeResponse>(
-    `${API_URL}/resumes`,
+    `${API_URL}/resume`,
     data,
     getAuthHeaders()
   );
@@ -176,10 +184,24 @@ export const updateResume = async (
   data: Partial<Resume>
 ): Promise<Resume> => {
   const response = await axios.put<ResumeResponse>(
-    `${API_URL}/resumes/${resumeId}`,
+    `${API_URL}/resume/${resumeId}`,
     data,
     getAuthHeaders()
   );
 
   return response.data.data;
+};
+
+export const downloadResumePdf = async (
+  resumeId: string
+): Promise<Blob> => {
+  const response = await axios.get(
+    `${API_URL}/resume/${resumeId}/download`,
+    {
+      ...getAuthHeaders(),
+      responseType: "blob",
+    }
+  );
+
+  return response.data;
 };

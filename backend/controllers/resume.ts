@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import path from "path";
 import mongoose from "mongoose";
+import PDFDocument from "pdfkit";
 
-import Resume from "../models/resume";
+import Resume, { IResume } from "../models/resume";
 import { extractTextFromPdf } from "../services/pdfservice";
 import { extractTextFromDocx } from "../services/docxservice";
 import { calculateATS } from "../services/ats";
@@ -45,14 +46,14 @@ export const analyzeResume = async (req: Request, res: Response, next: NextFunct
     }
   
 
-    const resume = await Resume.create({
-      userId: req.user!._id,
-      title: req.file.originalname,  // 👈 add this line
-    originalName: req.file.originalname,
-    fileName: req.file.filename,
-    fileType: req.file.mimetype,
-    fileSize: req.file.size,
-    extractedText,
+    const resume: IResume = await Resume.create({
+  userId: req.user!._id,
+  title: req.file.originalname,
+  originalName: req.file.originalname,
+  fileName: req.file.filename,
+  fileType: req.file.mimetype,
+  fileSize: req.file.size,
+  extractedText,
 });
 
     // 🔍 Try OpenAI first
@@ -148,7 +149,7 @@ export const getResumeById = async (
     if (!resume) {
       return res.status(404).json({
         success: false,
-        message: "Resume not found.",
+        message: "Resume not found",
       });
     }
 
@@ -239,6 +240,18 @@ export const updateResume = async (
   next: NextFunction
 ) => {
   try {
+   const resume = await Resume.findOne({
+  _id: req.params.id,
+  userId: req.user!._id,
+});
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: "Resume not found",
+      });
+    }
+
     const {
       title,
       firstName,
@@ -251,6 +264,37 @@ export const updateResume = async (
       skills,
     } = req.body;
 
+    resume.title = title ?? resume.title;
+
+    resume.firstName = firstName ?? resume.firstName;
+    resume.lastName = lastName ?? resume.lastName;
+    resume.jobTitle = jobTitle ?? resume.jobTitle;
+
+    resume.email = email ?? resume.email;
+    resume.phone = phone ?? resume.phone;
+    resume.location = location ?? resume.location;
+
+    resume.summary = summary ?? resume.summary;
+    resume.skills = skills ?? resume.skills;
+
+    const updatedResume = await resume.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Resume updated successfully",
+      data: updatedResume,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const downloadResumePdf = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
     const resume = await Resume.findOne({
       _id: req.params.id,
       userId: req.user!._id,
@@ -263,52 +307,110 @@ export const updateResume = async (
       });
     }
 
-    /*
-     * Update only fields that were sent.
-     */
-    if (title !== undefined) {
-      resume.title = title.trim();
-    }
-
-    if (firstName !== undefined) {
-      resume.firstName = firstName;
-    }
-
-    if (lastName !== undefined) {
-      resume.lastName = lastName;
-    }
-
-    if (jobTitle !== undefined) {
-      resume.jobTitle = jobTitle;
-    }
-
-    if (email !== undefined) {
-      resume.email = email;
-    }
-
-    if (phone !== undefined) {
-      resume.phone = phone;
-    }
-
-    if (location !== undefined) {
-      resume.location = location;
-    }
-
-    if (summary !== undefined) {
-      resume.summary = summary;
-    }
-
-    if (skills !== undefined) {
-      resume.skills = skills;
-    }
-
-    await resume.save();
-
-    return res.status(200).json({
-      success: true,
-      message: "Resume updated successfully.",
-      data: resume,
+    const doc = new PDFDocument({
+      size: "A4",
+      margin: 50,
     });
+
+    const fileName =
+      `${resume.title || "resume"}`
+        .replace(/[^a-z0-9]/gi, "_")
+        .toLowerCase() + ".pdf";
+
+    res.setHeader(
+      "Content-Type",
+      "application/pdf"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${fileName}"`
+    );
+
+    doc.pipe(res);
+
+    /*
+     * NAME
+     */
+    doc
+      .fontSize(24)
+      .font("Helvetica-Bold")
+      .text(
+        `${resume.firstName || ""} ${resume.lastName || ""}`.trim() ||
+          "Resume"
+      );
+
+    /*
+     * JOB TITLE
+     */
+    if (resume.jobTitle) {
+      doc
+        .moveDown(0.4)
+        .fontSize(13)
+        .font("Helvetica")
+        .text(resume.jobTitle);
+    }
+
+    /*
+     * CONTACT
+     */
+    const contact = [
+      resume.email,
+      resume.phone,
+      resume.location,
+    ]
+      .filter(Boolean)
+      .join(" | ");
+
+    if (contact) {
+      doc
+        .moveDown(0.4)
+        .fontSize(9)
+        .text(contact);
+    }
+
+    doc.moveDown();
+
+    doc
+      .moveTo(50, doc.y)
+      .lineTo(545, doc.y)
+      .stroke();
+
+    /*
+     * SUMMARY
+     */
+    if (resume.summary) {
+      doc
+        .moveDown()
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .text("PROFESSIONAL SUMMARY");
+
+      doc
+        .moveDown(0.4)
+        .fontSize(10)
+        .font("Helvetica")
+        .text(resume.summary);
+    }
+
+    /*
+     * SKILLS
+     */
+    if (resume.skills) {
+      doc
+        .moveDown()
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .text("SKILLS");
+
+      doc
+        .moveDown(0.4)
+        .fontSize(10)
+        .font("Helvetica")
+        .text(resume.skills);
+    }
+
+    doc.end();
   } catch (error) {
     next(error);
   }

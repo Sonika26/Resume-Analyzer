@@ -3,7 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import {
   getResumeById,
+  createResume,
   updateResume,
+  downloadResumePdf,
 } from "../services/resume";
 
 import "./ResumeEditor.css";
@@ -44,24 +46,42 @@ const ResumeEditor = () => {
 
   const [saving, setSaving] = useState(false);
 
+  const [saved, setSaved] = useState(false);
+
   const [error, setError] = useState("");
+
 
   /*
    * Load existing resume when editing.
    */
 useEffect(() => {
-  if (!id) return; // no need to setLoading(false) here
+  if (!id) return;
 
   const loadResume = async () => {
     try {
       setLoading(true);
       setError("");
+
       const resume = await getResumeById(id);
-      setForm((prev) => ({
-        ...prev,
-        title: resume.title || resume.originalName || "My Resume",
-        summary: resume.extractedText || "",
-      }));
+
+      setForm({
+        title:
+          resume.title ||
+          resume.originalName ||
+          "My Resume",
+
+        firstName: resume.firstName || "",
+        lastName: resume.lastName || "",
+        jobTitle: resume.jobTitle || "",
+
+        email: resume.email || "",
+        phone: resume.phone || "",
+        location: resume.location || "",
+
+        summary: resume.summary || "",
+        skills: resume.skills || "",
+      });
+
     } catch (err) {
       console.error(err);
       setError("Unable to load this resume.");
@@ -72,7 +92,6 @@ useEffect(() => {
 
   loadResume();
 }, [id]);
-
   /*
    * Handle form changes.
    */
@@ -92,45 +111,147 @@ useEffect(() => {
   /*
    * Save resume.
    */
-  const handleSave = async () => {
-    try {
-      setSaving(true);
-      setError("");
+  const handleSave = async (): Promise<string | null> => {
+  try {
+    setSaving(true);
+    setSaved(false);
+    setError("");
 
-      if (!form.title.trim()) {
-        setError("Please enter a resume title.");
-        return;
-      }
-
-      if (isEditing && id) {
-        await updateResume(id, {
-          title: form.title,
-        });
-
-        alert("Resume saved successfully.");
-      } else {
-        /*
-         * Create endpoint will be connected
-         * when we finish the backend builder API.
-         */
-        alert(
-          "Resume creation API will be connected in the next backend step."
-        );
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Unable to save resume.");
-    } finally {
-      setSaving(false);
+    if (!form.title.trim()) {
+      setError("Please enter a resume title.");
+      return null;
     }
-  };
+
+    const resumeData = {
+      title: form.title,
+
+      firstName: form.firstName,
+      lastName: form.lastName,
+      jobTitle: form.jobTitle,
+
+      email: form.email,
+      phone: form.phone,
+      location: form.location,
+
+      summary: form.summary,
+      skills: form.skills,
+    };
+
+    /*
+     * EDIT EXISTING RESUME
+     */
+    if (isEditing && id) {
+      const updatedResume = await updateResume(
+        id,
+        resumeData
+      );
+
+      setSaved(true);
+
+      return updatedResume._id;
+    }
+
+    /*
+     * CREATE NEW RESUME
+     */
+    const newResume = await createResume(
+      resumeData
+    );
+
+    setSaved(true);
+
+    /*
+     * Move the browser to the newly created
+     * resume's edit page.
+     */
+    navigate(
+      `/resume/${newResume._id}/edit`,
+      {
+        replace: true,
+      }
+    );
+
+    return newResume._id;
+  } catch (err: any) {
+    console.error("Save resume error:", err);
+
+    setError(
+      err?.response?.data?.message ||
+        "Unable to save resume."
+    );
+
+    return null;
+  } finally {
+    setSaving(false);
+  }
+};
 
   /*
    * Exit editor.
    */
-  const handleExit = () => {
+ const handleSaveAndExit = async () => {
+  const resumeId = await handleSave();
+
+  if (resumeId) {
     navigate("/resume");
-  };
+  }
+};
+
+const handleExitWithoutSave = () => {
+  navigate("/resume");
+};
+
+const handleDownloadPdf = async () => {
+  try {
+    setError("");
+
+    /*
+     * A new resume doesn't have an ID yet.
+     *
+     * Save it first.
+     */
+    let resumeId: string | null = id ?? null;
+
+    if (!resumeId) {
+      resumeId = await handleSave();
+    }
+
+    if (!resumeId) {
+      setError("Please save the resume before downloading.");
+      return;
+    }
+
+    const blob = await downloadResumePdf(
+      resumeId
+    );
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+
+    link.download = `${form.title || "resume"}.pdf`;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+  } catch (err: any) {
+    console.error(
+      "Download PDF error:",
+      err
+    );
+
+    setError(
+      err?.response?.data?.message ||
+        "Unable to download PDF."
+    );
+  }
+};
 
   if (loading) {
     return (
@@ -145,7 +266,7 @@ useEffect(() => {
       <div className="resume-editor-loading">
         <p className="editor-error">{error}</p>
 
-        <button onClick={handleExit}>
+        <button onClick={handleSaveAndExit}>
           Back to Resumes
         </button>
       </div>
@@ -159,41 +280,54 @@ useEffect(() => {
 
       <header className="resume-editor-header">
 
-        <button
-          className="save-exit-btn"
-          onClick={handleExit}
-        >
-          ← Save & Exit
-        </button>
+  <button
+    className="save-exit-btn"
+    onClick={handleSaveAndExit}
+    disabled={saving}
+  >
+    ← {saving ? "Saving..." : "Save & Exit"}
+  </button>
 
-        <div className="editor-title">
-          <h1>Resume Builder</h1>
+  <button onClick={handleExitWithoutSave}>
+  Back to Resumes
+</button>
 
-          <span className="saved-status">
-            ✓ Saved in the cloud
-          </span>
-        </div>
+  <div className="editor-title">
 
-        <div className="editor-actions">
+    <h1>Resume Builder</h1>
 
-          <button
-            className="download-btn"
-            type="button"
-          >
-            Download PDF
-          </button>
+    <span className="saved-status">
+      {saving
+        ? "Saving..."
+        : saved
+        ? "✓ Saved in the cloud"
+        : "Unsaved changes"}
+    </span>
 
-          <button
-            className="save-btn"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? "Saving..." : "Save"}
-          </button>
+  </div>
 
-        </div>
+  <div className="editor-actions">
 
-      </header>
+    <button
+      className="download-btn"
+      type="button"
+      onClick={handleDownloadPdf}
+      disabled={saving}
+    >
+      Download PDF
+    </button>
+
+    <button
+      className="save-btn"
+      onClick={() => handleSave()}
+      disabled={saving}
+    >
+      {saving ? "Saving..." : "Save"}
+    </button>
+
+  </div>
+
+</header>
 
       {/* ================= EDITOR BODY ================= */}
 

@@ -1,35 +1,34 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 
 export interface IResume extends Document {
+
   userId: Types.ObjectId;
 
-  title: string;
+  originalName: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
 
-  // Uploaded file information
-  originalName?: string;
-  fileName?: string;
-  fileType?: string;
-  fileSize?: number;
+  title?: string;
 
-  // Extracted resume text
-  extractedText?: string;
-
-  // Resume Builder data
   firstName?: string;
   lastName?: string;
   jobTitle?: string;
+
   email?: string;
   phone?: string;
   location?: string;
+
   summary?: string;
   skills?: string;
+
+  extractedText: string;
 
   analysis?: {
     atsScore?: number;
     grammarScore?: number;
     formattingScore?: number;
     overallScore?: number;
-
     suggestions?: string[];
     source?: string;
   };
@@ -37,18 +36,12 @@ export interface IResume extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
-
 const resumeSchema = new Schema<IResume>(
   {
     /*
      * OWNER OF THE RESUME
      */
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true,
-    },
+  
 
     /*
      * RESUME TITLE

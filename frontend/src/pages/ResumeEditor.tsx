@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
 import {
   getResumeById,
   createResume,
@@ -8,30 +7,35 @@ import {
   downloadResumePdf,
 } from "../services/resume";
 
+import type { ResumeForm } from "../types/resume";
+
 import "./ResumeEditor.css";
 
-interface ResumeForm {
-  title: string;
-  firstName: string;
-  lastName: string;
-  jobTitle: string;
-  email: string;
-  phone: string;
-  location: string;
-  summary: string;
-  skills: string;
-}
 
 const emptyForm: ResumeForm = {
   title: "",
+
   firstName: "",
   lastName: "",
   jobTitle: "",
+
   email: "",
   phone: "",
   location: "",
+
+  linkedin: "",
+  github: "",
+  portfolio: "",
+
   summary: "",
+
   skills: "",
+
+  experience: [],
+  education: [],
+  projects: [],
+  certifications: [],
+  languages: [],
 };
 
 const ResumeEditor = () => {
@@ -64,24 +68,33 @@ useEffect(() => {
 
       const resume = await getResumeById(id);
 
-      setForm({
-        title:
-          resume.title ||
-          resume.originalName ||
-          "My Resume",
+    setForm({
+  title:
+    resume.title ||
+    resume.originalName ||
+    "My Resume",
 
-        firstName: resume.firstName || "",
-        lastName: resume.lastName || "",
-        jobTitle: resume.jobTitle || "",
+  firstName: resume.firstName || "",
+  lastName: resume.lastName || "",
+  jobTitle: resume.jobTitle || "",
 
-        email: resume.email || "",
-        phone: resume.phone || "",
-        location: resume.location || "",
+  email: resume.email || "",
+  phone: resume.phone || "",
+  location: resume.location || "",
 
-        summary: resume.summary || "",
-        skills: resume.skills || "",
-      });
+  linkedin: resume.linkedin || "",
+  github: resume.github || "",
+  portfolio: resume.portfolio || "",
 
+  summary: resume.summary || "",
+  skills: resume.skills || "",
+
+  experience: resume.experience || [],
+  education: resume.education || [],
+  projects: resume.projects || [],
+  certifications: resume.certifications || [],
+  languages: resume.languages || [],
+});
     } catch (err) {
       console.error(err);
       setError("Unable to load this resume.");
@@ -123,19 +136,29 @@ useEffect(() => {
     }
 
     const resumeData = {
-      title: form.title,
+  title: form.title,
 
-      firstName: form.firstName,
-      lastName: form.lastName,
-      jobTitle: form.jobTitle,
+  firstName: form.firstName,
+  lastName: form.lastName,
+  jobTitle: form.jobTitle,
 
-      email: form.email,
-      phone: form.phone,
-      location: form.location,
+  email: form.email,
+  phone: form.phone,
+  location: form.location,
 
-      summary: form.summary,
-      skills: form.skills,
-    };
+  linkedin: form.linkedin,
+  github: form.github,
+  portfolio: form.portfolio,
+
+  summary: form.summary,
+  skills: form.skills,
+
+  experience: form.experience,
+  education: form.education,
+  projects: form.projects,
+  certifications: form.certifications,
+  languages: form.languages,
+};
 
     /*
      * EDIT EXISTING RESUME
@@ -419,7 +442,41 @@ const handleDownloadPdf = async () => {
                 placeholder="Bangalore, India"
               />
             </label>
+            <label>
+  LinkedIn
 
+  <input
+    type="url"
+    name="linkedin"
+    value={form.linkedin}
+    onChange={handleChange}
+    placeholder="https://linkedin.com/in/yourname"
+  />
+</label>
+
+<label>
+  GitHub
+
+  <input
+    type="url"
+    name="github"
+    value={form.github}
+    onChange={handleChange}
+    placeholder="https://github.com/yourname"
+  />
+</label>
+
+<label>
+  Portfolio
+
+  <input
+    type="url"
+    name="portfolio"
+    value={form.portfolio}
+    onChange={handleChange}
+    placeholder="https://yourportfolio.com"
+  />
+</label>
           </div>
 
           <div className="editor-section">
@@ -480,6 +537,35 @@ const handleDownloadPdf = async () => {
               {form.location && (
                 <span>{form.location}</span>
               )}
+              {form.linkedin && (
+    <a
+      href={form.linkedin}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      LinkedIn
+    </a>
+  )}
+
+  {form.github && (
+    <a
+      href={form.github}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      GitHub
+    </a>
+  )}
+
+  {form.portfolio && (
+    <a
+      href={form.portfolio}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Portfolio
+    </a>
+  )}
 
             </div>
 

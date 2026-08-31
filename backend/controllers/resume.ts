@@ -98,13 +98,14 @@ export const analyzeResume = async (req: Request, res: Response, next: NextFunct
     await resume.save();
 
     // ⭐ SEND RESPONSE IN CORRECT STRUCTURE FOR FRONTEND
-    return res.status(201).json({
-      success: true,
-      message: "Resume analyzed successfully.",
-      data: {
-        analysis: resume.analysis,
-      },
-    });
+   return res.status(201).json({
+  success: true,
+  message: "Resume analyzed successfully.",
+  data: {
+    resume,
+    analysis: resume.analysis,
+  },
+});
   } catch (error) {
     next(error);
   }
@@ -197,32 +198,55 @@ export const createResume = async (
   next: NextFunction
 ) => {
   try {
-    const {
-      title,
-      firstName,
-      lastName,
-      jobTitle,
-      email,
-      phone,
-      location,
-      summary,
-      skills,
-    } = req.body;
+   const {
+  title,
+  firstName,
+  lastName,
+  jobTitle,
+  email,
+  phone,
+  location,
 
-    const resume = await Resume.create({
-      userId: req.user!._id,
+  linkedin,
+  github,
+  portfolio,
 
-      title: title?.trim() || "My Resume",
+  summary,
+  skills,
 
-      firstName: firstName || "",
-      lastName: lastName || "",
-      jobTitle: jobTitle || "",
-      email: email || "",
-      phone: phone || "",
-      location: location || "",
-      summary: summary || "",
-      skills: skills || "",
-    });
+  experience,
+  education,
+  projects,
+  certifications,
+  languages,
+} = req.body;
+
+const resume = await Resume.create({
+  userId: req.user!._id,
+
+  title: title?.trim() || "My Resume",
+
+  firstName: firstName || "",
+  lastName: lastName || "",
+  jobTitle: jobTitle || "",
+
+  email: email || "",
+  phone: phone || "",
+  location: location || "",
+
+  linkedin: linkedin || "",
+  github: github || "",
+  portfolio: portfolio || "",
+
+  summary: summary || "",
+  skills: skills || "",
+
+  experience: experience || [],
+  education: education || [],
+  projects: projects || [],
+  certifications: certifications || [],
+  languages: languages || [],
+});
 
     return res.status(201).json({
       success: true,
@@ -252,17 +276,29 @@ export const updateResume = async (
       });
     }
 
-    const {
-      title,
-      firstName,
-      lastName,
-      jobTitle,
-      email,
-      phone,
-      location,
-      summary,
-      skills,
-    } = req.body;
+  const {
+  title,
+  firstName,
+  lastName,
+  jobTitle,
+
+  email,
+  phone,
+  location,
+
+  linkedin,
+  github,
+  portfolio,
+
+  summary,
+  skills,
+
+  experience,
+  education,
+  projects,
+  certifications,
+  languages,
+} = req.body;
 
     resume.title = title ?? resume.title;
 
@@ -276,6 +312,15 @@ export const updateResume = async (
 
     resume.summary = summary ?? resume.summary;
     resume.skills = skills ?? resume.skills;
+    resume.linkedin = linkedin ?? resume.linkedin;
+resume.github = github ?? resume.github;
+resume.portfolio = portfolio ?? resume.portfolio;
+
+resume.experience = experience ?? resume.experience;
+resume.education = education ?? resume.education;
+resume.projects = projects ?? resume.projects;
+resume.certifications = certifications ?? resume.certifications;
+resume.languages = languages ?? resume.languages;
 
     const updatedResume = await resume.save();
 

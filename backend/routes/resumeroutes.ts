@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
   analyzeResume,
   getResumeById,
+  getUserResumes,
   updateResume,
   deleteResume,
   downloadResumePdf,
@@ -18,6 +19,12 @@ router.post(
   protect,
   uploadResume.single("resume"),
   analyzeResume
+);
+// New route for fetching all resumes
+router.get(
+  "/",
+  protect,
+  getUserResumes
 );
 
 /*

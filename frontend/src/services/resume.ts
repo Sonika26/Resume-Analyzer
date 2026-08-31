@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { ResumeForm } from "../types/resume";
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -19,7 +20,7 @@ export interface Resume {
 
   extractedText?: string;
 
-  // Resume Builder fields
+  // Existing builder fields
   firstName?: string;
   lastName?: string;
   jobTitle?: string;
@@ -28,6 +29,17 @@ export interface Resume {
   location?: string;
   summary?: string;
   skills?: string;
+
+  // New personal links
+  linkedin?: string;
+  github?: string;
+  portfolio?: string;
+
+  experience?: ResumeForm["experience"];
+  education?: ResumeForm["education"];
+  projects?: ResumeForm["projects"];
+  certifications?: ResumeForm["certifications"];
+  languages?: ResumeForm["languages"];
 
   analysis?: {
     atsScore?: number;
@@ -166,7 +178,8 @@ export const deleteResume = async (
 export const createResume = async (data: {
   title: string;
   extractedText?: string;
-}): Promise<Resume> => {
+}
+): Promise<Resume> => {
   const response = await axios.post<ResumeResponse>(
     `${API_URL}/resume`,
     data,
@@ -181,7 +194,7 @@ export const createResume = async (data: {
  */
 export const updateResume = async (
   resumeId: string,
-  data: Partial<Resume>
+  data: Partial<ResumeForm>
 ): Promise<Resume> => {
   const response = await axios.put<ResumeResponse>(
     `${API_URL}/resume/${resumeId}`,

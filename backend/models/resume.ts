@@ -1,29 +1,69 @@
-import mongoose, { Document, Schema, Types } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IResume extends Document {
+  userId: mongoose.Types.ObjectId;
 
-  userId: Types.ObjectId;
+  title: string;
 
-  originalName: string;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
+  // Existing Resume Builder fields
+  firstName: string;
+  lastName: string;
+  jobTitle: string;
+  email: string;
+  phone: string;
+  location: string;
+  summary: string;
+  skills: string;
 
-  title?: string;
+  // Additional personal links
+  linkedin: string;
+  github: string;
+  portfolio: string;
 
-  firstName?: string;
-  lastName?: string;
-  jobTitle?: string;
+  // Experience
+  experience: {
+    company: string;
+    position: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    current: boolean;
+    description: string;
+  }[];
 
-  email?: string;
-  phone?: string;
-  location?: string;
+  // Education
+  education: {
+    institution: string;
+    degree: string;
+    field: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+  }[];
 
-  summary?: string;
-  skills?: string;
+  // Projects
+  projects: {
+    name: string;
+    description: string;
+    technologies: string;
+    url: string;
+  }[];
 
-  extractedText: string;
+  // Certifications
+  certifications: {
+    name: string;
+    issuer: string;
+    date: string;
+    url: string;
+  }[];
 
+  // Languages
+  languages: {
+    name: string;
+    level: string;
+  }[];
+
+  // Resume analysis
   analysis?: {
     atsScore?: number;
     grammarScore?: number;
@@ -33,22 +73,32 @@ export interface IResume extends Document {
     source?: string;
   };
 
+  // Uploaded file information
+  originalName?: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
+  extractedText?: string;
+
   createdAt: Date;
   updatedAt: Date;
 }
+
 const resumeSchema = new Schema<IResume>(
   {
     /*
-     * OWNER OF THE RESUME
+     * OWNER
+     *
+     * Keep this compatible with your existing authentication/controller.
      */
-  
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
 
     /*
      * RESUME TITLE
-     *
-     * Example:
-     * "Frontend Developer Resume"
-     * "React Developer Resume"
      */
     title: {
       type: String,
@@ -59,9 +109,6 @@ const resumeSchema = new Schema<IResume>(
 
     /*
      * UPLOADED FILE INFORMATION
-     *
-     * These are optional because a resume can now
-     * also be created directly inside the Resume Builder.
      */
     originalName: {
       type: String,
@@ -80,15 +127,12 @@ const resumeSchema = new Schema<IResume>(
       type: Number,
     },
 
-    /*
-     * EXTRACTED TEXT
-     */
     extractedText: {
       type: String,
     },
 
     /*
-     * RESUME BUILDER FIELDS
+     * EXISTING RESUME BUILDER FIELDS
      */
     firstName: {
       type: String,
@@ -134,6 +178,205 @@ const resumeSchema = new Schema<IResume>(
     skills: {
       type: String,
       default: "",
+    },
+
+    /*
+     * PERSONAL LINKS
+     */
+    linkedin: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    github: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    portfolio: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    /*
+     * EXPERIENCE
+     */
+    experience: {
+      type: [
+        {
+          company: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+
+          position: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+
+          location: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+
+          startDate: {
+            type: String,
+            default: "",
+          },
+
+          endDate: {
+            type: String,
+            default: "",
+          },
+
+          current: {
+            type: Boolean,
+            default: false,
+          },
+
+          description: {
+            type: String,
+            default: "",
+          },
+        },
+      ],
+      default: [],
+    },
+
+    /*
+     * EDUCATION
+     */
+    education: {
+      type: [
+        {
+          institution: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+
+          degree: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+
+          field: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+
+          startDate: {
+            type: String,
+            default: "",
+          },
+
+          endDate: {
+            type: String,
+            default: "",
+          },
+
+          description: {
+            type: String,
+            default: "",
+          },
+        },
+      ],
+      default: [],
+    },
+
+    /*
+     * PROJECTS
+     */
+    projects: {
+      type: [
+        {
+          name: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+
+          description: {
+            type: String,
+            default: "",
+          },
+
+          technologies: {
+            type: String,
+            default: "",
+          },
+
+          url: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+        },
+      ],
+      default: [],
+    },
+
+    /*
+     * CERTIFICATIONS
+     */
+    certifications: {
+      type: [
+        {
+          name: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+
+          issuer: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+
+          date: {
+            type: String,
+            default: "",
+          },
+
+          url: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+        },
+      ],
+      default: [],
+    },
+
+    /*
+     * LANGUAGES
+     */
+    languages: {
+      type: [
+        {
+          name: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+
+          level: {
+            type: String,
+            default: "",
+            trim: true,
+          },
+        },
+      ],
+      default: [],
     },
 
     /*

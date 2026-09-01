@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
 import {
   getResumeById,
   createResume,
@@ -7,10 +8,29 @@ import {
   downloadResumePdf,
 } from "../services/resume";
 
-import type { ResumeForm } from "../types/resume";
+import PersonalInfoForm from "../components/resume/PersonalInfoForm";
+import SummaryForm from "../components/resume/SummaryForm";
+import ExperienceForm from "../components/resume/ExperienceForm";
+import EducationForm from "../components/resume/EducationForm";
+import SkillsForm from "../components/resume/SkillsForm";
+import ProjectsForm from "../components/resume/ProjectsForm";
+import CertificationsForm from "../components/resume/CertificationsForm";
+import LanguagesForm from "../components/resume/LanguagesForm";
+import StepNavigation from "../components/resume/StepNavigation";
+
+import type {
+  ResumeForm,
+  Experience,
+} from "../types/resume";
 
 import "./ResumeEditor.css";
 
+
+/*
+ * =========================================================
+ * EMPTY RESUME FORM
+ * =========================================================
+ */
 
 const emptyForm: ResumeForm = {
   title: "",
@@ -38,556 +58,1584 @@ const emptyForm: ResumeForm = {
   languages: [],
 };
 
+
+/*
+ * =========================================================
+ * EMPTY EXPERIENCE
+ * =========================================================
+ */
+
+const emptyExperience: Experience = {
+  id: "",
+  company: "",
+  position: "",
+  location: "",
+  startDate: "",
+  endDate: "",
+  current: false,
+  description: "",
+};
+
+
+/*
+ * =========================================================
+ * RESUME EDITOR
+ * =========================================================
+ */
+
 const ResumeEditor = () => {
+
   const navigate = useNavigate();
+
   const { id } = useParams<{ id: string }>();
 
   const isEditing = Boolean(id);
 
-  const [form, setForm] = useState<ResumeForm>(emptyForm);
 
-  const [loading, setLoading] = useState<boolean>(isEditing);
+  /*
+   * =======================================================
+   * STEP STATE
+   * =======================================================
+   */
 
-  const [saving, setSaving] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
 
-  const [saved, setSaved] = useState(false);
-
-  const [error, setError] = useState("");
+  const totalSteps = 8;
 
 
   /*
-   * Load existing resume when editing.
+   * =======================================================
+   * RESUME STATE
+   * =======================================================
    */
-useEffect(() => {
-  if (!id) return;
 
-  const loadResume = async () => {
-    try {
-      setLoading(true);
-      setError("");
+  const [form, setForm] =
+    useState<ResumeForm>(emptyForm);
 
-      const resume = await getResumeById(id);
-
-    setForm({
-  title:
-    resume.title ||
-    resume.originalName ||
-    "My Resume",
-
-  firstName: resume.firstName || "",
-  lastName: resume.lastName || "",
-  jobTitle: resume.jobTitle || "",
-
-  email: resume.email || "",
-  phone: resume.phone || "",
-  location: resume.location || "",
-
-  linkedin: resume.linkedin || "",
-  github: resume.github || "",
-  portfolio: resume.portfolio || "",
-
-  summary: resume.summary || "",
-  skills: resume.skills || "",
-
-  experience: resume.experience || [],
-  education: resume.education || [],
-  projects: resume.projects || [],
-  certifications: resume.certifications || [],
-  languages: resume.languages || [],
-});
-    } catch (err) {
-      console.error(err);
-      setError("Unable to load this resume.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  loadResume();
-}, [id]);
-  /*
-   * Handle form changes.
-   */
-  const handleChange = (
-    event: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = event.target;
-
-    setForm((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-  };
 
   /*
-   * Save resume.
+   * =======================================================
+   * GENERAL UI STATE
+   * =======================================================
    */
-  const handleSave = async (): Promise<string | null> => {
-  try {
-    setSaving(true);
-    setSaved(false);
-    setError("");
 
-    if (!form.title.trim()) {
-      setError("Please enter a resume title.");
-      return null;
-    }
+  const [loading, setLoading] =
+    useState<boolean>(isEditing);
 
-    const resumeData = {
-  title: form.title,
+  const [saving, setSaving] =
+    useState(false);
 
-  firstName: form.firstName,
-  lastName: form.lastName,
-  jobTitle: form.jobTitle,
+  const [saved, setSaved] =
+    useState(false);
 
-  email: form.email,
-  phone: form.phone,
-  location: form.location,
+  const [error, setError] =
+    useState("");
 
-  linkedin: form.linkedin,
-  github: form.github,
-  portfolio: form.portfolio,
 
-  summary: form.summary,
-  skills: form.skills,
+  /*
+   * =======================================================
+   * EXPERIENCE STATE
+   * =======================================================
+   */
 
-  experience: form.experience,
-  education: form.education,
-  projects: form.projects,
-  certifications: form.certifications,
-  languages: form.languages,
-};
+  const [experienceForm, setExperienceForm] =
+    useState<Experience>(emptyExperience);
 
-    /*
-     * EDIT EXISTING RESUME
-     */
-    if (isEditing && id) {
-      const updatedResume = await updateResume(
-        id,
-        resumeData
+  const [editingExperienceId, setEditingExperienceId] =
+    useState<string | null>(null);
+
+  const [isExperienceFormOpen, setIsExperienceFormOpen] =
+    useState(false);
+
+
+  /*
+   * =======================================================
+   * LOAD EXISTING RESUME
+   * =======================================================
+   */
+
+  useEffect(() => {
+
+    if (!id) return;
+
+    const loadResume = async () => {
+
+      try {
+
+        setLoading(true);
+        setError("");
+
+        const resume =
+          await getResumeById(id);
+
+
+        setForm({
+
+          title:
+            resume.title ||
+            resume.originalName ||
+            "My Resume",
+
+          firstName:
+            resume.firstName || "",
+
+          lastName:
+            resume.lastName || "",
+
+          jobTitle:
+            resume.jobTitle || "",
+
+          email:
+            resume.email || "",
+
+          phone:
+            resume.phone || "",
+
+          location:
+            resume.location || "",
+
+          linkedin:
+            resume.linkedin || "",
+
+          github:
+            resume.github || "",
+
+          portfolio:
+            resume.portfolio || "",
+
+          summary:
+            resume.summary || "",
+
+          skills:
+            resume.skills || "",
+
+          experience:
+            resume.experience || [],
+
+          education:
+            resume.education || [],
+
+          projects:
+            resume.projects || [],
+
+          certifications:
+            resume.certifications || [],
+
+          languages:
+            resume.languages || [],
+
+        });
+
+      } catch (err) {
+
+        console.error(err);
+
+        setError(
+          "Unable to load this resume."
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+    loadResume();
+
+  }, [id]);
+
+
+  /*
+   * =======================================================
+   * STEP NAVIGATION
+   * =======================================================
+   */
+
+  const handleNextStep = () => {
+
+    if (currentStep < totalSteps) {
+
+      setCurrentStep(
+        (previous) => previous + 1
       );
 
-      setSaved(true);
-
-      return updatedResume._id;
     }
 
-    /*
-     * CREATE NEW RESUME
-     */
-    const newResume = await createResume(
-      resumeData
-    );
+  };
 
-    setSaved(true);
 
-    /*
-     * Move the browser to the newly created
-     * resume's edit page.
-     */
-    navigate(
-      `/resume/${newResume._id}/edit`,
-      {
-        replace: true,
-      }
-    );
+  const handlePreviousStep = () => {
 
-    return newResume._id;
-  } catch (err: any) {
-    console.error("Save resume error:", err);
+    if (currentStep > 1) {
 
-    setError(
-      err?.response?.data?.message ||
-        "Unable to save resume."
-    );
+      setCurrentStep(
+        (previous) => previous - 1
+      );
 
-    return null;
-  } finally {
-    setSaving(false);
-  }
-};
+    }
+
+  };
+
 
   /*
-   * Exit editor.
+   * =======================================================
+   * GENERAL FORM CHANGE
+   * =======================================================
    */
- const handleSaveAndExit = async () => {
-  const resumeId = await handleSave();
 
-  if (resumeId) {
-    navigate("/resume");
-  }
-};
+  const handleChange = (
+    event: React.ChangeEvent<
+      HTMLInputElement |
+      HTMLTextAreaElement
+    >
+  ) => {
 
-const handleExitWithoutSave = () => {
-  navigate("/resume");
-};
+    const {
+      name,
+      value,
+    } = event.target;
 
-const handleDownloadPdf = async () => {
-  try {
-    setError("");
+
+    setForm((previous) => ({
+
+      ...previous,
+
+      [name]: value,
+
+    }));
+
+  };
+
+
+  /*
+   * =======================================================
+   * EXPERIENCE FORM CHANGE
+   * =======================================================
+   */
+
+  const handleExperienceChange = (
+    event: React.ChangeEvent<
+      HTMLInputElement |
+      HTMLTextAreaElement
+    >
+  ) => {
+
+    const {
+      name,
+      value,
+      type,
+    } = event.target;
+
 
     /*
-     * A new resume doesn't have an ID yet.
-     *
-     * Save it first.
+     * CHECKBOX
      */
-    let resumeId: string | null = id ?? null;
 
-    if (!resumeId) {
-      resumeId = await handleSave();
-    }
+    if (type === "checkbox") {
 
-    if (!resumeId) {
-      setError("Please save the resume before downloading.");
+      const checked =
+        (event.target as HTMLInputElement)
+          .checked;
+
+
+      setExperienceForm(
+        (previous) => ({
+
+          ...previous,
+
+          [name]: checked,
+
+        })
+      );
+
       return;
     }
 
-    const blob = await downloadResumePdf(
-      resumeId
+
+    /*
+     * TEXT / DATE / TEXTAREA
+     */
+
+    setExperienceForm(
+      (previous) => ({
+
+        ...previous,
+
+        [name]: value,
+
+      })
     );
 
-    const url = window.URL.createObjectURL(blob);
+  };
 
-    const link = document.createElement("a");
 
-    link.href = url;
+  /*
+   * =======================================================
+   * ADD / UPDATE EXPERIENCE
+   * =======================================================
+   */
 
-    link.download = `${form.title || "resume"}.pdf`;
+  const handleSaveExperience = () => {
 
-    document.body.appendChild(link);
+    /*
+     * Validate company
+     */
 
-    link.click();
+    if (
+      !experienceForm.company.trim()
+    ) {
 
-    link.remove();
+      setError(
+        "Please enter the company name."
+      );
 
-    window.URL.revokeObjectURL(url);
-  } catch (err: any) {
-    console.error(
-      "Download PDF error:",
-      err
+      return;
+    }
+
+
+    /*
+     * Validate position
+     */
+
+    if (
+      !experienceForm.position.trim()
+    ) {
+
+      setError(
+        "Please enter the position."
+      );
+
+      return;
+    }
+
+
+    setError("");
+
+
+    /*
+     * UPDATE EXISTING EXPERIENCE
+     */
+
+    if (editingExperienceId) {
+
+      setForm((previous) => ({
+
+        ...previous,
+
+        experience:
+          previous.experience.map(
+            (experience) =>
+
+              experience.id ===
+              editingExperienceId
+
+                ? {
+                    ...experienceForm,
+
+                    id:
+                      editingExperienceId,
+                  }
+
+                : experience
+          ),
+
+      }));
+
+    }
+
+    /*
+     * ADD NEW EXPERIENCE
+     */
+
+    else {
+
+      const newExperience:
+        Experience = {
+
+        ...experienceForm,
+
+        id:
+          crypto.randomUUID(),
+
+      };
+
+
+      setForm((previous) => ({
+
+        ...previous,
+
+        experience: [
+
+          ...previous.experience,
+
+          newExperience,
+
+        ],
+
+      }));
+
+    }
+
+
+    /*
+     * RESET EXPERIENCE FORM
+     */
+
+    setExperienceForm(
+      emptyExperience
     );
 
-    setError(
-      err?.response?.data?.message ||
-        "Unable to download PDF."
+    setEditingExperienceId(
+      null
     );
-  }
-};
+
+    setIsExperienceFormOpen(
+      false
+    );
+
+  };
+
+
+  /*
+   * =======================================================
+   * EDIT EXPERIENCE
+   * =======================================================
+   */
+
+  const handleEditExperience = (
+    experience: Experience
+  ) => {
+
+    setExperienceForm(
+      experience
+    );
+
+    setEditingExperienceId(
+      experience.id
+    );
+
+    setIsExperienceFormOpen(
+      true
+    );
+
+    setError("");
+
+  };
+
+
+  /*
+   * =======================================================
+   * DELETE EXPERIENCE
+   * =======================================================
+   */
+
+  const handleDeleteExperience = (
+    experienceId: string
+  ) => {
+
+    setForm((previous) => ({
+
+      ...previous,
+
+      experience:
+        previous.experience.filter(
+          (experience) =>
+            experience.id !==
+            experienceId
+        ),
+
+    }));
+
+
+    if (
+      editingExperienceId ===
+      experienceId
+    ) {
+
+      setExperienceForm(
+        emptyExperience
+      );
+
+      setEditingExperienceId(
+        null
+      );
+
+      setIsExperienceFormOpen(
+        false
+      );
+
+    }
+
+  };
+
+
+  /*
+   * =======================================================
+   * CANCEL EXPERIENCE
+   * =======================================================
+   */
+
+  const handleCancelExperience = () => {
+
+    setExperienceForm(
+      emptyExperience
+    );
+
+    setEditingExperienceId(
+      null
+    );
+
+    setIsExperienceFormOpen(
+      false
+    );
+
+    setError("");
+
+  };
+
+
+  /*
+   * =======================================================
+   * SAVE RESUME
+   * =======================================================
+   */
+
+  const handleSave = async (): Promise<
+    string | null
+  > => {
+
+    try {
+
+      setSaving(true);
+
+      setSaved(false);
+
+      setError("");
+
+
+      /*
+       * Validate title
+       */
+
+      if (!form.title.trim()) {
+
+        setError(
+          "Please enter a resume title."
+        );
+
+        return null;
+
+      }
+
+
+      /*
+       * Resume data
+       */
+
+      const resumeData = {
+
+        title:
+          form.title,
+
+        firstName:
+          form.firstName,
+
+        lastName:
+          form.lastName,
+
+        jobTitle:
+          form.jobTitle,
+
+        email:
+          form.email,
+
+        phone:
+          form.phone,
+
+        location:
+          form.location,
+
+        linkedin:
+          form.linkedin,
+
+        github:
+          form.github,
+
+        portfolio:
+          form.portfolio,
+
+        summary:
+          form.summary,
+
+        skills:
+          form.skills,
+
+        experience:
+          form.experience,
+
+        education:
+          form.education,
+
+        projects:
+          form.projects,
+
+        certifications:
+          form.certifications,
+
+        languages:
+          form.languages,
+
+      };
+
+
+      /*
+       * ===================================================
+       * UPDATE EXISTING RESUME
+       * ===================================================
+       */
+
+      if (
+        isEditing &&
+        id
+      ) {
+
+        const updatedResume =
+          await updateResume(
+            id,
+            resumeData
+          );
+
+
+        setSaved(true);
+
+
+        return updatedResume._id;
+
+      }
+
+
+      /*
+       * ===================================================
+       * CREATE NEW RESUME
+       * ===================================================
+       */
+
+      const newResume =
+        await createResume(
+          resumeData
+        );
+
+
+      setSaved(true);
+
+
+      /*
+       * Move to edit page
+       */
+
+      navigate(
+        `/resume/${newResume._id}/edit`,
+        {
+          replace: true,
+        }
+      );
+
+
+      return newResume._id;
+
+    } catch (err: any) {
+
+      console.error(
+        "Save resume error:",
+        err
+      );
+
+
+      setError(
+        err?.response?.data?.message ||
+        "Unable to save resume."
+      );
+
+
+      return null;
+
+    } finally {
+
+      setSaving(false);
+
+    }
+
+  };
+
+
+  /*
+   * =======================================================
+   * SAVE AND EXIT
+   * =======================================================
+   */
+
+  const handleSaveAndExit =
+    async () => {
+
+      const resumeId =
+        await handleSave();
+
+
+      if (resumeId) {
+
+        navigate("/resume");
+
+      }
+
+    };
+
+
+  /*
+   * =======================================================
+   * EXIT WITHOUT SAVE
+   * =======================================================
+   */
+
+  const handleExitWithoutSave =
+    () => {
+
+      navigate("/resume");
+
+    };
+
+
+  /*
+   * =======================================================
+   * DOWNLOAD PDF
+   * =======================================================
+   */
+
+  const handleDownloadPdf =
+    async () => {
+
+      try {
+
+        setError("");
+
+
+        /*
+         * Existing resume
+         */
+
+        let resumeId:
+          string | null =
+          id ?? null;
+
+
+        /*
+         * New resume
+         */
+
+        if (!resumeId) {
+
+          resumeId =
+            await handleSave();
+
+        }
+
+
+        if (!resumeId) {
+
+          setError(
+            "Please save the resume before downloading."
+          );
+
+          return;
+
+        }
+
+
+        /*
+         * Get PDF
+         */
+
+        const blob =
+          await downloadResumePdf(
+            resumeId
+          );
+
+
+        /*
+         * Create download URL
+         */
+
+        const url =
+          window.URL.createObjectURL(
+            blob
+          );
+
+
+        const link =
+          document.createElement(
+            "a"
+          );
+
+
+        link.href = url;
+
+
+        link.download =
+          `${form.title || "resume"}.pdf`;
+
+
+        document.body.appendChild(
+          link
+        );
+
+
+        link.click();
+
+
+        link.remove();
+
+
+        window.URL.revokeObjectURL(
+          url
+        );
+
+      } catch (err: any) {
+
+        console.error(
+          "Download PDF error:",
+          err
+        );
+
+
+        setError(
+          err?.response?.data?.message ||
+          "Unable to download PDF."
+        );
+
+      }
+
+    };
+
+
+  /*
+   * =======================================================
+   * LOADING SCREEN
+   * =======================================================
+   */
 
   if (loading) {
+
     return (
+
       <div className="resume-editor-loading">
-        <p>Loading resume...</p>
+
+        <p>
+          Loading resume...
+        </p>
+
       </div>
+
     );
+
   }
 
-  if (error && isEditing && !form.title) {
-    return (
-      <div className="resume-editor-loading">
-        <p className="editor-error">{error}</p>
 
-        <button onClick={handleSaveAndExit}>
+  /*
+   * =======================================================
+   * ERROR SCREEN
+   * =======================================================
+   */
+
+  if (
+    error &&
+    isEditing &&
+    !form.title
+  ) {
+
+    return (
+
+      <div className="resume-editor-loading">
+
+        <p className="editor-error">
+          {error}
+        </p>
+
+
+        <button
+          onClick={
+            handleExitWithoutSave
+          }
+        >
           Back to Resumes
         </button>
+
       </div>
+
     );
+
   }
 
+
+  /*
+   * =======================================================
+   * MAIN EDITOR
+   * =======================================================
+   */
+
   return (
+
     <div className="resume-editor">
 
-      {/* ================= HEADER ================= */}
+
+      {/* ===================================================
+          HEADER
+      =================================================== */}
 
       <header className="resume-editor-header">
 
-  <button
-    className="save-exit-btn"
-    onClick={handleSaveAndExit}
-    disabled={saving}
-  >
-    ← {saving ? "Saving..." : "Save & Exit"}
-  </button>
 
-  <button onClick={handleExitWithoutSave}>
-  Back to Resumes
-</button>
+        <button
+          className="save-exit-btn"
+          onClick={
+            handleSaveAndExit
+          }
+          disabled={saving}
+        >
 
-  <div className="editor-title">
+          ←{" "}
 
-    <h1>Resume Builder</h1>
+          {saving
+            ? "Saving..."
+            : "Save & Exit"}
 
-    <span className="saved-status">
-      {saving
-        ? "Saving..."
-        : saved
-        ? "✓ Saved in the cloud"
-        : "Unsaved changes"}
-    </span>
+        </button>
 
-  </div>
 
-  <div className="editor-actions">
+        <button
+          onClick={
+            handleExitWithoutSave
+          }
+        >
+          Back to Resumes
+        </button>
 
-    <button
-      className="download-btn"
-      type="button"
-      onClick={handleDownloadPdf}
-      disabled={saving}
-    >
-      Download PDF
-    </button>
 
-    <button
-      className="save-btn"
-      onClick={() => handleSave()}
-      disabled={saving}
-    >
-      {saving ? "Saving..." : "Save"}
-    </button>
+        <div className="editor-title">
 
-  </div>
+          <h1>
+            Resume Builder
+          </h1>
 
-</header>
 
-      {/* ================= EDITOR BODY ================= */}
+          <span className="saved-status">
+
+            {saving
+              ? "Saving..."
+              : saved
+              ? "✓ Saved in the cloud"
+              : "Unsaved changes"}
+
+          </span>
+
+        </div>
+
+
+        <div className="editor-actions">
+
+
+          <button
+            className="download-btn"
+            type="button"
+            onClick={
+              handleDownloadPdf
+            }
+            disabled={saving}
+          >
+            Download PDF
+          </button>
+
+
+          <button
+            className="save-btn"
+            type="button"
+            onClick={() =>
+              handleSave()
+            }
+            disabled={saving}
+          >
+
+            {saving
+              ? "Saving..."
+              : "Save"}
+
+          </button>
+
+
+        </div>
+
+      </header>
+
+
+      {/* ===================================================
+          EDITOR BODY
+      =================================================== */}
 
       <div className="resume-editor-body">
 
-        {/* LEFT SIDE */}
+
+        {/* =================================================
+            LEFT SIDEBAR
+        ================================================= */}
 
         <aside className="resume-editor-sidebar">
+
+
+          {/* =================================================
+              RESUME TITLE
+          ================================================= */}
 
           <div className="resume-name-section">
 
             <input
               name="title"
               value={form.title}
-              onChange={handleChange}
+              onChange={
+                handleChange
+              }
               placeholder="Resume title"
               className="resume-title-input"
             />
 
           </div>
 
-          <div className="editor-section">
 
-            <h2>Personal Information</h2>
+          {/* =================================================
+              STEP 1 - PERSONAL INFORMATION
+          ================================================= */}
 
-            <label>
-              First Name
+          {currentStep === 1 && (
 
-              <input
-                name="firstName"
-                value={form.firstName}
-                onChange={handleChange}
-                placeholder="First Name"
+            <div className="editor-section">
+
+              <h2>
+                Personal Information
+              </h2>
+
+
+              <PersonalInfoForm
+                form={form}
+                onChange={
+                  handleChange
+                }
               />
-            </label>
-
-            <label>
-              Last Name
-
-              <input
-                name="lastName"
-                value={form.lastName}
-                onChange={handleChange}
-                placeholder="Last Name"
-              />
-            </label>
-
-            <label>
-              Job Title
-
-              <input
-                name="jobTitle"
-                value={form.jobTitle}
-                onChange={handleChange}
-                placeholder="Frontend Developer"
-              />
-            </label>
-
-            <label>
-              Email
-
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="email@example.com"
-              />
-            </label>
-
-            <label>
-              Phone
-
-              <input
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                placeholder="+91 9876543210"
-              />
-            </label>
-
-            <label>
-              Location
-
-              <input
-                name="location"
-                value={form.location}
-                onChange={handleChange}
-                placeholder="Bangalore, India"
-              />
-            </label>
-            <label>
-  LinkedIn
-
-  <input
-    type="url"
-    name="linkedin"
-    value={form.linkedin}
-    onChange={handleChange}
-    placeholder="https://linkedin.com/in/yourname"
-  />
-</label>
-
-<label>
-  GitHub
-
-  <input
-    type="url"
-    name="github"
-    value={form.github}
-    onChange={handleChange}
-    placeholder="https://github.com/yourname"
-  />
-</label>
-
-<label>
-  Portfolio
-
-  <input
-    type="url"
-    name="portfolio"
-    value={form.portfolio}
-    onChange={handleChange}
-    placeholder="https://yourportfolio.com"
-  />
-</label>
-          </div>
-
-          <div className="editor-section">
-
-            <h2>Professional Summary</h2>
-
-            <textarea
-              name="summary"
-              value={form.summary}
-              onChange={handleChange}
-              placeholder="Write your professional summary..."
-              rows={8}
-            />
-
-          </div>
-
-          <div className="editor-section">
-
-            <h2>Skills</h2>
-
-            <textarea
-              name="skills"
-              value={form.skills}
-              onChange={handleChange}
-              placeholder="React, TypeScript, Node.js..."
-              rows={5}
-            />
-
-          </div>
-
-        </aside>
-
-        {/* RIGHT SIDE */}
-
-        <main className="resume-preview-area">
-
-          <div className="resume-paper">
-
-            <h1>
-              {form.firstName || "Your"}{" "}
-              {form.lastName || "Name"}
-            </h1>
-
-            <h2>
-              {form.jobTitle || "Professional Title"}
-            </h2>
-
-            <div className="preview-contact">
-
-              {form.email && (
-                <span>{form.email}</span>
-              )}
-
-              {form.phone && (
-                <span>{form.phone}</span>
-              )}
-
-              {form.location && (
-                <span>{form.location}</span>
-              )}
-              {form.linkedin && (
-    <a
-      href={form.linkedin}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      LinkedIn
-    </a>
-  )}
-
-  {form.github && (
-    <a
-      href={form.github}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      GitHub
-    </a>
-  )}
-
-  {form.portfolio && (
-    <a
-      href={form.portfolio}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Portfolio
-    </a>
-  )}
 
             </div>
 
+          )}
+
+
+          {/* =================================================
+              STEP 2 - SUMMARY
+          ================================================= */}
+
+          {currentStep === 2 && (
+
+            <div className="editor-section">
+
+              <h2>
+                Professional Summary
+              </h2>
+
+
+              <SummaryForm
+                form={form}
+                onChange={
+                  handleChange
+                }
+              />
+
+            </div>
+
+          )}
+
+
+          {/* =================================================
+              STEP 3 - EXPERIENCE
+          ================================================= */}
+
+          {currentStep === 3 && (
+
+            <div className="editor-section">
+
+              <ExperienceForm
+
+                experiences={
+                  form.experience
+                }
+
+                experienceForm={
+                  experienceForm
+                }
+
+                editingExperienceId={
+                  editingExperienceId
+                }
+
+                isExperienceFormOpen={
+                  isExperienceFormOpen
+                }
+
+                onAdd={() => {
+
+                  setExperienceForm(
+                    emptyExperience
+                  );
+
+                  setEditingExperienceId(
+                    null
+                  );
+
+                  setIsExperienceFormOpen(
+                    true
+                  );
+
+                  setError("");
+
+                }}
+
+                onChange={
+                  handleExperienceChange
+                }
+
+                onSave={
+                  handleSaveExperience
+                }
+
+                onEdit={
+                  handleEditExperience
+                }
+
+                onDelete={
+                  handleDeleteExperience
+                }
+
+                onCancel={
+                  handleCancelExperience
+                }
+
+              />
+
+            </div>
+
+          )}
+
+
+          {/* =================================================
+              STEP 4 - EDUCATION
+          ================================================= */}
+
+          {currentStep === 4 && (
+
+            <div className="editor-section">
+
+              <h2>
+                Education
+              </h2>
+
+
+              <EducationForm
+                form={form}
+              />
+
+            </div>
+
+          )}
+
+
+          {/* =================================================
+              STEP 5 - SKILLS
+          ================================================= */}
+
+          {currentStep === 5 && (
+
+            <div className="editor-section">
+
+              <h2>
+                Skills
+              </h2>
+
+
+              <SkillsForm
+                form={form}
+                onChange={
+                  handleChange
+                }
+              />
+
+            </div>
+
+          )}
+
+
+          {/* =================================================
+              STEP 6 - PROJECTS
+          ================================================= */}
+
+          {currentStep === 6 && (
+
+            <div className="editor-section">
+
+              <h2>
+                Projects
+              </h2>
+
+
+              <ProjectsForm
+                form={form}
+              />
+
+            </div>
+
+          )}
+
+
+          {/* =================================================
+              STEP 7 - CERTIFICATIONS
+          ================================================= */}
+
+          {currentStep === 7 && (
+
+            <div className="editor-section">
+
+              <h2>
+                Certifications
+              </h2>
+
+
+              <CertificationsForm
+                form={form}
+              />
+
+            </div>
+
+          )}
+
+
+          {/* =================================================
+              STEP 8 - LANGUAGES
+          ================================================= */}
+
+          {currentStep === 8 && (
+
+            <div className="editor-section">
+
+              <h2>
+                Languages
+              </h2>
+
+
+              <LanguagesForm
+                form={form}
+              />
+
+            </div>
+
+          )}
+
+        </aside>
+
+
+        {/* =================================================
+            RIGHT SIDE - LIVE PREVIEW
+        ================================================= */}
+
+        <main className="resume-preview-area">
+
+
+          <div className="resume-paper">
+
+
+            {/* =================================================
+                NAME
+            ================================================= */}
+
+            <h1>
+
+              {form.firstName ||
+                "Your"}{" "}
+
+              {form.lastName ||
+                "Name"}
+
+            </h1>
+
+
+            {/* =================================================
+                JOB TITLE
+            ================================================= */}
+
+            <h2>
+
+              {form.jobTitle ||
+                "Professional Title"}
+
+            </h2>
+
+
+            {/* =================================================
+                CONTACT
+            ================================================= */}
+
+            <div className="preview-contact">
+
+
+              {form.email && (
+
+                <span>
+                  {form.email}
+                </span>
+
+              )}
+
+
+              {form.phone && (
+
+                <span>
+                  {form.phone}
+                </span>
+
+              )}
+
+
+              {form.location && (
+
+                <span>
+                  {form.location}
+                </span>
+
+              )}
+
+
+              {form.linkedin && (
+
+                <a
+                  href={
+                    form.linkedin
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  LinkedIn
+                </a>
+
+              )}
+
+
+              {form.github && (
+
+                <a
+                  href={
+                    form.github
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  GitHub
+                </a>
+
+              )}
+
+
+              {form.portfolio && (
+
+                <a
+                  href={
+                    form.portfolio
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Portfolio
+                </a>
+
+              )}
+
+            </div>
+
+
             <hr />
 
-            <section>
-              <h3>PROFESSIONAL SUMMARY</h3>
 
-              <p>
-                {form.summary ||
-                  "Your professional summary will appear here."}
-              </p>
-            </section>
+            {/* =================================================
+                SUMMARY PREVIEW
+            ================================================= */}
 
-            <section>
-              <h3>SKILLS</h3>
+            {form.summary && (
 
-              <p>
-                {form.skills ||
-                  "Your skills will appear here."}
-              </p>
-            </section>
+              <section>
+
+                <h3>
+                  PROFESSIONAL SUMMARY
+                </h3>
+
+
+                <p>
+                  {form.summary}
+                </p>
+
+              </section>
+
+            )}
+
+
+            {/* =================================================
+                EXPERIENCE PREVIEW
+            ================================================= */}
+
+            {form.experience.length >
+              0 && (
+
+              <section
+                className="resume-section"
+              >
+
+                <h3>
+                  EXPERIENCE
+                </h3>
+
+
+                {form.experience.map(
+                  (experience) => (
+
+                    <div
+                      key={
+                        experience.id
+                      }
+                      className="preview-experience"
+                    >
+
+
+                      <div className="preview-experience-header">
+
+
+                        <div>
+
+                          <h4>
+                            {
+                              experience.position
+                            }
+                          </h4>
+
+
+                          <strong>
+                            {
+                              experience.company
+                            }
+                          </strong>
+
+                        </div>
+
+
+                        <div className="preview-experience-meta">
+
+
+                          {experience.startDate && (
+
+                            <span>
+
+                              {
+                                experience.startDate
+                              }
+
+                              {" – "}
+
+                              {experience.current
+                                ? "Present"
+                                : experience.endDate ||
+                                  ""}
+
+                            </span>
+
+                          )}
+
+
+                          {experience.location && (
+
+                            <span>
+                              {
+                                experience.location
+                              }
+                            </span>
+
+                          )}
+
+                        </div>
+
+                      </div>
+
+
+                      {experience.description && (
+
+                        <p>
+                          {
+                            experience.description
+                          }
+                        </p>
+
+                      )}
+
+                    </div>
+
+                  )
+                )}
+
+              </section>
+
+            )}
+
+
+            {/* =================================================
+                SKILLS PREVIEW
+            ================================================= */}
+
+            {form.skills && (
+
+              <section>
+
+                <h3>
+                  SKILLS
+                </h3>
+
+
+                <p>
+                  {form.skills}
+                </p>
+
+              </section>
+
+            )}
+
+
+            {/* =================================================
+                EMPTY PREVIEW
+            ================================================= */}
+
+            {!form.summary &&
+              form.experience.length === 0 &&
+              !form.skills && (
+
+                <section>
+
+                  <p>
+                    Your resume preview
+                    will appear here as
+                    you enter information.
+                  </p>
+
+                </section>
+
+              )}
 
           </div>
 
@@ -595,8 +1643,36 @@ const handleDownloadPdf = async () => {
 
       </div>
 
+
+      {/* ===================================================
+          STEP NAVIGATION
+      =================================================== */}
+
+      <StepNavigation
+
+        currentStep={
+          currentStep
+        }
+
+        totalSteps={
+          totalSteps
+        }
+
+        onPrevious={
+          handlePreviousStep
+        }
+
+        onNext={
+          handleNextStep
+        }
+
+      />
+
     </div>
+
   );
+
 };
+
 
 export default ResumeEditor;

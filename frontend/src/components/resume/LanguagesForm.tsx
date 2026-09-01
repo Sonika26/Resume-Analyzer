@@ -1,23 +1,23 @@
 import type { ResumeForm } from "../../types/resume";
 
-interface CertificationsFormProps {
+interface LanguagesFormProps {
   form: ResumeForm;
 }
 
-const CertificationsForm = ({
+const LanguagesForm = ({
   form,
-}: CertificationsFormProps) => {
+}: LanguagesFormProps) => {
   return (
     <div className="form-fields">
 
       <p className="section-placeholder">
-        Certifications section coming next.
+        Languages section coming next.
       </p>
 
       <p>
         You currently have{" "}
-        {form.certifications.length} certification
-        {form.certifications.length !== 1
+        {form.languages.length} language
+        {form.languages.length !== 1
           ? "s"
           : ""}.
       </p>
@@ -26,4 +26,4 @@ const CertificationsForm = ({
   );
 };
 
-export default CertificationsForm;
+export default LanguagesForm;

@@ -1,3 +1,5 @@
+export type ResumeTemplate = "classic" | "modern" | "minimal";
+
 export interface Experience {
   id: string;
   company: string;
@@ -7,6 +9,14 @@ export interface Experience {
   endDate: string;
   current: boolean;
   description: string;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  organization?: string;
+  date?: string;
+  description?: string;
 }
 
 export interface Education {
@@ -22,17 +32,10 @@ export interface Education {
 export interface Project {
   id: string;
   name: string;
-  description: string;
-  technologies: string;
-  url: string;
-}
-
-export interface Certification {
-  id: string;
-  name: string;
-  issuer: string;
-  date: string;
-  url: string;
+  role?: string;
+  url?: string;
+  description?: string;
+  technologies?: string;
 }
 
 export interface Language {
@@ -40,8 +43,11 @@ export interface Language {
   name: string;
   level: string;
 }
+
 export interface ResumeForm {
   title: string;
+
+  template: ResumeTemplate;
 
   firstName: string;
   lastName: string;
@@ -57,11 +63,20 @@ export interface ResumeForm {
 
   summary: string;
 
+  /*
+   * Keep skills as a string for now.
+   *
+   * We'll eventually convert the UI into
+   * individual skill objects.
+   */
   skills: string;
 
   experience: Experience[];
   education: Education[];
   projects: Project[];
-  certifications: Certification[];
-  languages: Language[];
+  achievements: Achievement[];
+}
+
+export interface Resume extends ResumeForm {
+  id: string;
 }

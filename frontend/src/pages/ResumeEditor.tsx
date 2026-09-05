@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -14,26 +14,26 @@ import ExperienceForm from "../components/resume/ExperienceForm";
 import EducationForm from "../components/resume/EducationForm";
 import SkillsForm from "../components/resume/SkillsForm";
 import ProjectsForm from "../components/resume/ProjectsForm";
-import CertificationsForm from "../components/resume/CertificationsForm";
-import LanguagesForm from "../components/resume/LanguagesForm";
-import StepNavigation from "../components/resume/StepNavigation";
+import AchievementsForm from "../components/resume/AchievementsForm";
+
+import TemplateSelector from "../templates/resume/TemplateSelector";
+import ClassicTemplate from "../templates/resume/ClassicTemplate";
+import ModernTemplate from "../templates/resume/ModernTemplate";
+import MinimalTemplate from "../templates/resume/MinimalTemplate";
+import "../templates/resume/template.css";
 
 import type {
   ResumeForm,
   Experience,
+  Project,
+  Achievement,
 } from "../types/resume";
 
 import "./ResumeEditor.css";
 
-
-/*
- * =========================================================
- * EMPTY RESUME FORM
- * =========================================================
- */
-
 const emptyForm: ResumeForm = {
   title: "",
+  template: "classic",
 
   firstName: "",
   lastName: "",
@@ -54,16 +54,8 @@ const emptyForm: ResumeForm = {
   experience: [],
   education: [],
   projects: [],
-  certifications: [],
-  languages: [],
+  achievements: [],
 };
-
-
-/*
- * =========================================================
- * EMPTY EXPERIENCE
- * =========================================================
- */
 
 const emptyExperience: Experience = {
   id: "",
@@ -76,66 +68,43 @@ const emptyExperience: Experience = {
   description: "",
 };
 
+const emptyProject: Project = {
+  id: "",
+  name: "",
+  role: "",
+  url: "",
+  description: "",
+  technologies: "",
+};
 
-/*
- * =========================================================
- * RESUME EDITOR
- * =========================================================
- */
+const emptyAchievement: Achievement = {
+  id: "",
+  title: "",
+  organization: "",
+  date: "",
+  description: "",
+};
 
 const ResumeEditor = () => {
-
   const navigate = useNavigate();
-
   const { id } = useParams<{ id: string }>();
 
   const isEditing = Boolean(id);
 
-
-  /*
-   * =======================================================
-   * STEP STATE
-   * =======================================================
-   */
-
   const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 7;
 
-  const totalSteps = 8;
+  const [form, setForm] = useState<ResumeForm>(emptyForm);
 
-
-  /*
-   * =======================================================
-   * RESUME STATE
-   * =======================================================
-   */
-
-  const [form, setForm] =
-    useState<ResumeForm>(emptyForm);
-
+  const [loading, setLoading] = useState<boolean>(isEditing);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   /*
-   * =======================================================
-   * GENERAL UI STATE
-   * =======================================================
-   */
-
-  const [loading, setLoading] =
-    useState<boolean>(isEditing);
-
-  const [saving, setSaving] =
-    useState(false);
-
-  const [saved, setSaved] =
-    useState(false);
-
-  const [error, setError] =
-    useState("");
-
-
-  /*
-   * =======================================================
+   * ============================
    * EXPERIENCE STATE
-   * =======================================================
+   * ============================
    */
 
   const [experienceForm, setExperienceForm] =
@@ -147,593 +116,526 @@ const ResumeEditor = () => {
   const [isExperienceFormOpen, setIsExperienceFormOpen] =
     useState(false);
 
+  /*
+   * ============================
+   * PROJECT STATE
+   * ============================
+   */
+
+  const [projectForm, setProjectForm] =
+    useState<Project>(emptyProject);
+
+  const [editingProjectId, setEditingProjectId] =
+    useState<string | null>(null);
+
+  const [isProjectFormOpen, setIsProjectFormOpen] =
+    useState(false);
 
   /*
-   * =======================================================
-   * LOAD EXISTING RESUME
-   * =======================================================
+   * ============================
+   * ACHIEVEMENT STATE
+   * ============================
+   */
+
+  const [achievementForm, setAchievementForm] =
+    useState<Achievement>(emptyAchievement);
+
+  const [editingAchievementId, setEditingAchievementId] =
+    useState<string | null>(null);
+
+  const [isAchievementFormOpen, setIsAchievementFormOpen] =
+    useState(false);
+
+  /*
+   * ============================
+   * LOAD RESUME
+   * ============================
    */
 
   useEffect(() => {
-
     if (!id) return;
 
     const loadResume = async () => {
-
       try {
-
         setLoading(true);
         setError("");
 
-        const resume =
-          await getResumeById(id);
-
+        const resume = await getResumeById(id);
 
         setForm({
+          
 
-          title:
-            resume.title ||
-            resume.originalName ||
-            "My Resume",
+           title: resume.title || "",
 
-          firstName:
-            resume.firstName || "",
+          template: resume.template || "classic",
 
-          lastName:
-            resume.lastName || "",
+          firstName: resume.firstName || "",
+          lastName: resume.lastName || "",
+          jobTitle: resume.jobTitle || "",
 
-          jobTitle:
-            resume.jobTitle || "",
+          email: resume.email || "",
+          phone: resume.phone || "",
+          location: resume.location || "",
 
-          email:
-            resume.email || "",
+          linkedin: resume.linkedin || "",
+          github: resume.github || "",
+          portfolio: resume.portfolio || "",
 
-          phone:
-            resume.phone || "",
+          summary: resume.summary || "",
+          skills: resume.skills || "",
 
-          location:
-            resume.location || "",
+          experience: resume.experience || [],
+          education: resume.education || [],
+          projects: resume.projects || [],
 
-          linkedin:
-            resume.linkedin || "",
-
-          github:
-            resume.github || "",
-
-          portfolio:
-            resume.portfolio || "",
-
-          summary:
-            resume.summary || "",
-
-          skills:
-            resume.skills || "",
-
-          experience:
-            resume.experience || [],
-
-          education:
-            resume.education || [],
-
-          projects:
-            resume.projects || [],
-
-          certifications:
-            resume.certifications || [],
-
-          languages:
-            resume.languages || [],
-
+          achievements:
+            "achievements" in resume &&
+            Array.isArray(resume.achievements)
+              ? resume.achievements
+              : [],
         });
-
       } catch (err) {
-
         console.error(err);
-
-        setError(
-          "Unable to load this resume."
-        );
-
+        setError("Unable to load this resume.");
       } finally {
-
         setLoading(false);
-
       }
-
     };
 
     loadResume();
-
   }, [id]);
 
-
   /*
-   * =======================================================
+   * ============================
    * STEP NAVIGATION
-   * =======================================================
+   * ============================
    */
 
   const handleNextStep = () => {
-
     if (currentStep < totalSteps) {
-
-      setCurrentStep(
-        (previous) => previous + 1
-      );
-
+      setCurrentStep((previous) => previous + 1);
     }
-
   };
-
 
   const handlePreviousStep = () => {
-
     if (currentStep > 1) {
-
-      setCurrentStep(
-        (previous) => previous - 1
-      );
-
+      setCurrentStep((previous) => previous - 1);
     }
-
   };
 
-
   /*
-   * =======================================================
+   * ============================
    * GENERAL FORM CHANGE
-   * =======================================================
+   * ============================
    */
 
   const handleChange = (
-    event: React.ChangeEvent<
-      HTMLInputElement |
-      HTMLTextAreaElement
+    event: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement
     >
   ) => {
-
-    const {
-      name,
-      value,
-    } = event.target;
-
+    const { name, value } = event.target;
 
     setForm((previous) => ({
-
       ...previous,
-
       [name]: value,
-
     }));
 
+    setSaved(false);
   };
 
-
   /*
-   * =======================================================
-   * EXPERIENCE FORM CHANGE
-   * =======================================================
+   * ============================
+   * EXPERIENCE
+   * ============================
    */
 
   const handleExperienceChange = (
-    event: React.ChangeEvent<
-      HTMLInputElement |
-      HTMLTextAreaElement
+    event: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement
     >
   ) => {
-
-    const {
-      name,
-      value,
-      type,
-    } = event.target;
-
-
-    /*
-     * CHECKBOX
-     */
+    const { name, value, type } = event.target;
 
     if (type === "checkbox") {
+      const checked = (
+        event.target as HTMLInputElement
+      ).checked;
 
-      const checked =
-        (event.target as HTMLInputElement)
-          .checked;
-
-
-      setExperienceForm(
-        (previous) => ({
-
-          ...previous,
-
-          [name]: checked,
-
-        })
-      );
+      setExperienceForm((previous) => ({
+        ...previous,
+        [name]: checked,
+      }));
 
       return;
     }
 
-
-    /*
-     * TEXT / DATE / TEXTAREA
-     */
-
-    setExperienceForm(
-      (previous) => ({
-
-        ...previous,
-
-        [name]: value,
-
-      })
-    );
-
+    setExperienceForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   };
 
-
-  /*
-   * =======================================================
-   * ADD / UPDATE EXPERIENCE
-   * =======================================================
-   */
+  const handleAddExperience = () => {
+    setExperienceForm(emptyExperience);
+    setEditingExperienceId(null);
+    setIsExperienceFormOpen(true);
+    setError("");
+  };
 
   const handleSaveExperience = () => {
-
-    /*
-     * Validate company
-     */
-
-    if (
-      !experienceForm.company.trim()
-    ) {
-
-      setError(
-        "Please enter the company name."
-      );
-
+    if (!experienceForm.company.trim()) {
+      setError("Please enter the company name.");
       return;
     }
 
-
-    /*
-     * Validate position
-     */
-
-    if (
-      !experienceForm.position.trim()
-    ) {
-
-      setError(
-        "Please enter the position."
-      );
-
+    if (!experienceForm.position.trim()) {
+      setError("Please enter the position.");
       return;
     }
-
 
     setError("");
 
-
-    /*
-     * UPDATE EXISTING EXPERIENCE
-     */
-
     if (editingExperienceId) {
-
       setForm((previous) => ({
-
         ...previous,
-
-        experience:
-          previous.experience.map(
-            (experience) =>
-
-              experience.id ===
-              editingExperienceId
-
-                ? {
-                    ...experienceForm,
-
-                    id:
-                      editingExperienceId,
-                  }
-
-                : experience
-          ),
-
+        experience: previous.experience.map(
+          (experience) =>
+            experience.id === editingExperienceId
+              ? {
+                  ...experienceForm,
+                  id: editingExperienceId,
+                }
+              : experience
+        ),
       }));
-
-    }
-
-    /*
-     * ADD NEW EXPERIENCE
-     */
-
-    else {
-
-      const newExperience:
-        Experience = {
-
+    } else {
+      const newExperience: Experience = {
         ...experienceForm,
-
-        id:
-          crypto.randomUUID(),
-
+        id: crypto.randomUUID(),
       };
 
-
       setForm((previous) => ({
-
         ...previous,
-
         experience: [
-
           ...previous.experience,
-
           newExperience,
-
         ],
-
       }));
-
     }
 
-
-    /*
-     * RESET EXPERIENCE FORM
-     */
-
-    setExperienceForm(
-      emptyExperience
-    );
-
-    setEditingExperienceId(
-      null
-    );
-
-    setIsExperienceFormOpen(
-      false
-    );
-
+    setExperienceForm(emptyExperience);
+    setEditingExperienceId(null);
+    setIsExperienceFormOpen(false);
+    setSaved(false);
   };
-
-
-  /*
-   * =======================================================
-   * EDIT EXPERIENCE
-   * =======================================================
-   */
 
   const handleEditExperience = (
     experience: Experience
   ) => {
-
-    setExperienceForm(
-      experience
-    );
-
-    setEditingExperienceId(
-      experience.id
-    );
-
-    setIsExperienceFormOpen(
-      true
-    );
-
+    setExperienceForm(experience);
+    setEditingExperienceId(experience.id);
+    setIsExperienceFormOpen(true);
     setError("");
-
   };
-
-
-  /*
-   * =======================================================
-   * DELETE EXPERIENCE
-   * =======================================================
-   */
 
   const handleDeleteExperience = (
     experienceId: string
   ) => {
-
     setForm((previous) => ({
-
       ...previous,
-
-      experience:
-        previous.experience.filter(
-          (experience) =>
-            experience.id !==
-            experienceId
-        ),
-
+      experience: previous.experience.filter(
+        (experience) =>
+          experience.id !== experienceId
+      ),
     }));
 
-
-    if (
-      editingExperienceId ===
-      experienceId
-    ) {
-
-      setExperienceForm(
-        emptyExperience
-      );
-
-      setEditingExperienceId(
-        null
-      );
-
-      setIsExperienceFormOpen(
-        false
-      );
-
-    }
-
+    setSaved(false);
   };
 
+  const handleCancelExperience = () => {
+    setExperienceForm(emptyExperience);
+    setEditingExperienceId(null);
+    setIsExperienceFormOpen(false);
+    setError("");
+  };
 
   /*
-   * =======================================================
-   * CANCEL EXPERIENCE
-   * =======================================================
+   * ============================
+   * EDUCATION
+   * ============================
    */
 
-  const handleCancelExperience = () => {
+  /*
+   * ============================
+   * PROJECTS
+   * ============================
+   */
 
-    setExperienceForm(
-      emptyExperience
-    );
+  const handleProjectChange = (
+    event: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = event.target;
 
-    setEditingExperienceId(
-      null
-    );
+    setProjectForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
 
-    setIsExperienceFormOpen(
-      false
-    );
+  const handleAddProject = () => {
+    setProjectForm(emptyProject);
+    setEditingProjectId(null);
+    setIsProjectFormOpen(true);
+    setError("");
+  };
+
+  const handleSaveProject = () => {
+    if (!projectForm.name.trim()) {
+      setError("Please enter the project name.");
+      return;
+    }
 
     setError("");
 
+    if (editingProjectId) {
+      setForm((previous) => ({
+        ...previous,
+        projects: previous.projects.map(
+          (project) =>
+            project.id === editingProjectId
+              ? {
+                  ...projectForm,
+                  id: editingProjectId,
+                }
+              : project
+        ),
+      }));
+    } else {
+      const newProject: Project = {
+        ...projectForm,
+        id: crypto.randomUUID(),
+      };
+
+      setForm((previous) => ({
+        ...previous,
+        projects: [
+          ...previous.projects,
+          newProject,
+        ],
+      }));
+    }
+
+    setProjectForm(emptyProject);
+    setEditingProjectId(null);
+    setIsProjectFormOpen(false);
+    setSaved(false);
   };
 
+  const handleEditProject = (
+    project: Project
+  ) => {
+    setProjectForm(project);
+    setEditingProjectId(project.id);
+    setIsProjectFormOpen(true);
+    setError("");
+  };
+
+  const handleDeleteProject = (
+    projectId: string
+  ) => {
+    setForm((previous) => ({
+      ...previous,
+      projects: previous.projects.filter(
+        (project) =>
+          project.id !== projectId
+      ),
+    }));
+
+    setSaved(false);
+  };
+
+  const handleCancelProject = () => {
+    setProjectForm(emptyProject);
+    setEditingProjectId(null);
+    setIsProjectFormOpen(false);
+    setError("");
+  };
 
   /*
-   * =======================================================
+   * ============================
+   * ACHIEVEMENTS
+   * ============================
+   */
+
+  const handleAchievementChange = (
+    event: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = event.target;
+
+    setAchievementForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const handleAddAchievement = () => {
+    setAchievementForm(emptyAchievement);
+    setEditingAchievementId(null);
+    setIsAchievementFormOpen(true);
+    setError("");
+  };
+
+  const handleSaveAchievement = () => {
+    if (!achievementForm.title.trim()) {
+      setError(
+        "Please enter the achievement title."
+      );
+      return;
+    }
+
+    setError("");
+
+    if (editingAchievementId) {
+      setForm((previous) => ({
+        ...previous,
+        achievements:
+          previous.achievements.map(
+            (achievement) =>
+              achievement.id ===
+              editingAchievementId
+                ? {
+                    ...achievementForm,
+                    id: editingAchievementId,
+                  }
+                : achievement
+          ),
+      }));
+    } else {
+      const newAchievement: Achievement = {
+        ...achievementForm,
+        id: crypto.randomUUID(),
+      };
+
+      setForm((previous) => ({
+        ...previous,
+        achievements: [
+          ...previous.achievements,
+          newAchievement,
+        ],
+      }));
+    }
+
+    setAchievementForm(emptyAchievement);
+    setEditingAchievementId(null);
+    setIsAchievementFormOpen(false);
+    setSaved(false);
+  };
+
+  const handleEditAchievement = (
+    achievement: Achievement
+  ) => {
+    setAchievementForm(achievement);
+    setEditingAchievementId(achievement.id);
+    setIsAchievementFormOpen(true);
+    setError("");
+  };
+
+  const handleDeleteAchievement = (
+    achievementId: string
+  ) => {
+    setForm((previous) => ({
+      ...previous,
+      achievements:
+        previous.achievements.filter(
+          (achievement) =>
+            achievement.id !== achievementId
+        ),
+    }));
+
+    setSaved(false);
+  };
+
+  const handleCancelAchievement = () => {
+    setAchievementForm(emptyAchievement);
+    setEditingAchievementId(null);
+    setIsAchievementFormOpen(false);
+    setError("");
+  };
+
+  /*
+   * ============================
    * SAVE RESUME
-   * =======================================================
+   * ============================
    */
 
   const handleSave = async (): Promise<
     string | null
   > => {
-
     try {
-
       setSaving(true);
-
       setSaved(false);
-
       setError("");
 
-
-      /*
-       * Validate title
-       */
-
       if (!form.title.trim()) {
-
-        setError(
-          "Please enter a resume title."
-        );
-
+        setError("Please enter a resume title.");
         return null;
-
       }
 
-
-      /*
-       * Resume data
-       */
-
       const resumeData = {
+        title: form.title,
+        template: form.template,
 
-        title:
-          form.title,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        jobTitle: form.jobTitle,
 
-        firstName:
-          form.firstName,
+        email: form.email,
+        phone: form.phone,
+        location: form.location,
 
-        lastName:
-          form.lastName,
+        linkedin: form.linkedin,
+        github: form.github,
+        portfolio: form.portfolio,
 
-        jobTitle:
-          form.jobTitle,
+        summary: form.summary,
+        skills: form.skills,
 
-        email:
-          form.email,
-
-        phone:
-          form.phone,
-
-        location:
-          form.location,
-
-        linkedin:
-          form.linkedin,
-
-        github:
-          form.github,
-
-        portfolio:
-          form.portfolio,
-
-        summary:
-          form.summary,
-
-        skills:
-          form.skills,
-
-        experience:
-          form.experience,
-
-        education:
-          form.education,
-
-        projects:
-          form.projects,
-
-        certifications:
-          form.certifications,
-
-        languages:
-          form.languages,
-
+        experience: form.experience,
+        education: form.education,
+        projects: form.projects,
+        achievements: form.achievements,
       };
 
-
       /*
-       * ===================================================
-       * UPDATE EXISTING RESUME
-       * ===================================================
+       * EDIT EXISTING RESUME
        */
 
-      if (
-        isEditing &&
-        id
-      ) {
-
+      if (isEditing && id) {
         const updatedResume =
           await updateResume(
             id,
             resumeData
           );
 
-
         setSaved(true);
 
-
         return updatedResume._id;
-
       }
-
+      console.log("TEMPLATE BEING SAVED:", form.template);
 
       /*
-       * ===================================================
        * CREATE NEW RESUME
-       * ===================================================
        */
 
       const newResume =
-        await createResume(
-          resumeData
-        );
-
+        await createResume(resumeData);
 
       setSaved(true);
-
-
-      /*
-       * Move to edit page
-       */
 
       navigate(
         `/resume/${newResume._id}/edit`,
@@ -742,900 +644,568 @@ const ResumeEditor = () => {
         }
       );
 
-
       return newResume._id;
-
     } catch (err: any) {
-
       console.error(
         "Save resume error:",
         err
       );
 
+      setError(
+        err?.response?.data?.message ||
+          "Unable to save resume."
+      );
+
+      return null;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /*
+   * ============================
+   * SAVE AND EXIT
+   * ============================
+   */
+
+  const handleSaveAndExit = async () => {
+    const resumeId = await handleSave();
+
+    if (resumeId) {
+      navigate("/resume");
+    }
+  };
+
+  const handleExitWithoutSave = () => {
+    navigate("/resume");
+  };
+
+  /*
+   * ============================
+   * DOWNLOAD PDF
+   * ============================
+   */
+
+  const handleDownloadPdf = async () => {
+    try {
+      setError("");
+
+      let resumeId: string | null =
+        id ?? null;
+
+      if (!resumeId) {
+        resumeId = await handleSave();
+      }
+
+      if (!resumeId) {
+        setError(
+          "Please save the resume before downloading."
+        );
+        return;
+      }
+
+      const blob =
+        await downloadResumePdf(resumeId);
+
+      const url =
+        window.URL.createObjectURL(blob);
+
+      const link =
+        document.createElement("a");
+
+      link.href = url;
+
+      link.download =
+        `${form.title || "resume"}.pdf`;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      console.error(
+        "Download PDF error:",
+        err
+      );
 
       setError(
         err?.response?.data?.message ||
-        "Unable to save resume."
+          "Unable to download PDF."
       );
-
-
-      return null;
-
-    } finally {
-
-      setSaving(false);
-
     }
-
   };
 
-
   /*
-   * =======================================================
-   * SAVE AND EXIT
-   * =======================================================
-   */
-
-  const handleSaveAndExit =
-    async () => {
-
-      const resumeId =
-        await handleSave();
-
-
-      if (resumeId) {
-
-        navigate("/resume");
-
-      }
-
-    };
-
-
-  /*
-   * =======================================================
-   * EXIT WITHOUT SAVE
-   * =======================================================
-   */
-
-  const handleExitWithoutSave =
-    () => {
-
-      navigate("/resume");
-
-    };
-
-
-  /*
-   * =======================================================
-   * DOWNLOAD PDF
-   * =======================================================
-   */
-
-  const handleDownloadPdf =
-    async () => {
-
-      try {
-
-        setError("");
-
-
-        /*
-         * Existing resume
-         */
-
-        let resumeId:
-          string | null =
-          id ?? null;
-
-
-        /*
-         * New resume
-         */
-
-        if (!resumeId) {
-
-          resumeId =
-            await handleSave();
-
-        }
-
-
-        if (!resumeId) {
-
-          setError(
-            "Please save the resume before downloading."
-          );
-
-          return;
-
-        }
-
-
-        /*
-         * Get PDF
-         */
-
-        const blob =
-          await downloadResumePdf(
-            resumeId
-          );
-
-
-        /*
-         * Create download URL
-         */
-
-        const url =
-          window.URL.createObjectURL(
-            blob
-          );
-
-
-        const link =
-          document.createElement(
-            "a"
-          );
-
-
-        link.href = url;
-
-
-        link.download =
-          `${form.title || "resume"}.pdf`;
-
-
-        document.body.appendChild(
-          link
-        );
-
-
-        link.click();
-
-
-        link.remove();
-
-
-        window.URL.revokeObjectURL(
-          url
-        );
-
-      } catch (err: any) {
-
-        console.error(
-          "Download PDF error:",
-          err
-        );
-
-
-        setError(
-          err?.response?.data?.message ||
-          "Unable to download PDF."
-        );
-
-      }
-
-    };
-
-
-  /*
-   * =======================================================
-   * LOADING SCREEN
-   * =======================================================
+   * ============================
+   * LOADING
+   * ============================
    */
 
   if (loading) {
-
     return (
-
       <div className="resume-editor-loading">
-
-        <p>
-          Loading resume...
-        </p>
-
+        <p>Loading resume...</p>
       </div>
-
     );
-
   }
-
-
-  /*
-   * =======================================================
-   * ERROR SCREEN
-   * =======================================================
-   */
 
   if (
     error &&
     isEditing &&
     !form.title
   ) {
-
     return (
-
       <div className="resume-editor-loading">
-
         <p className="editor-error">
           {error}
         </p>
 
-
         <button
-          onClick={
-            handleExitWithoutSave
-          }
+          onClick={handleSaveAndExit}
         >
           Back to Resumes
         </button>
-
       </div>
-
     );
-
   }
 
+  /*
+   * ============================
+   * LIVE PREVIEW DATA
+   * ============================
+   */
+
+  const previewExperience =
+    isExperienceFormOpen &&
+    experienceForm.company.trim()
+      ? editingExperienceId
+        ? form.experience.map(
+            (experience) =>
+              experience.id ===
+              editingExperienceId
+                ? experienceForm
+                : experience
+          )
+        : [
+            ...form.experience,
+            experienceForm,
+          ]
+      : form.experience;
+
+  const previewProjects =
+    isProjectFormOpen &&
+    projectForm.name.trim()
+      ? editingProjectId
+        ? form.projects.map(
+            (project) =>
+              project.id ===
+              editingProjectId
+                ? projectForm
+                : project
+          )
+        : [
+            ...form.projects,
+            projectForm,
+          ]
+      : form.projects;
+
+  const previewAchievements =
+    isAchievementFormOpen &&
+    achievementForm.title.trim()
+      ? editingAchievementId
+        ? form.achievements.map(
+            (achievement) =>
+              achievement.id ===
+              editingAchievementId
+                ? achievementForm
+                : achievement
+          )
+        : [
+            ...form.achievements,
+            achievementForm,
+          ]
+      : form.achievements;
 
   /*
-   * =======================================================
-   * MAIN EDITOR
-   * =======================================================
+   * ============================
+   * RENDER
+   * ============================
    */
 
   return (
-
     <div className="resume-editor">
 
-
-      {/* ===================================================
-          HEADER
-      =================================================== */}
+      {/* ================= HEADER ================= */}
 
       <header className="resume-editor-header">
 
-
         <button
           className="save-exit-btn"
-          onClick={
-            handleSaveAndExit
-          }
+          onClick={handleSaveAndExit}
           disabled={saving}
         >
-
           ←{" "}
-
           {saving
             ? "Saving..."
             : "Save & Exit"}
-
         </button>
 
-
         <button
-          onClick={
-            handleExitWithoutSave
-          }
+          onClick={handleExitWithoutSave}
         >
           Back to Resumes
         </button>
 
-
         <div className="editor-title">
 
-          <h1>
-            Resume Builder
-          </h1>
-
+          <h1>Resume Builder</h1>
 
           <span className="saved-status">
-
             {saving
               ? "Saving..."
               : saved
               ? "✓ Saved in the cloud"
               : "Unsaved changes"}
-
           </span>
 
         </div>
 
-
         <div className="editor-actions">
-
 
           <button
             className="download-btn"
             type="button"
-            onClick={
-              handleDownloadPdf
-            }
+            onClick={handleDownloadPdf}
             disabled={saving}
           >
             Download PDF
           </button>
 
-
           <button
             className="save-btn"
-            type="button"
-            onClick={() =>
-              handleSave()
-            }
+            onClick={() => handleSave()}
             disabled={saving}
           >
-
             {saving
               ? "Saving..."
               : "Save"}
-
           </button>
-
 
         </div>
 
       </header>
 
-
-      {/* ===================================================
-          EDITOR BODY
-      =================================================== */}
+      {/* ================= EDITOR BODY ================= */}
 
       <div className="resume-editor-body">
 
-
-        {/* =================================================
-            LEFT SIDEBAR
-        ================================================= */}
+        {/* ================= LEFT SIDE ================= */}
 
         <aside className="resume-editor-sidebar">
-
-
-          {/* =================================================
-              RESUME TITLE
-          ================================================= */}
 
           <div className="resume-name-section">
 
             <input
               name="title"
               value={form.title}
-              onChange={
-                handleChange
-              }
+              onChange={handleChange}
               placeholder="Resume title"
               className="resume-title-input"
             />
 
           </div>
 
+          {/* ================= TEMPLATE SELECTOR ================= */}
 
-          {/* =================================================
-              STEP 1 - PERSONAL INFORMATION
-          ================================================= */}
+          <TemplateSelector
+            value={form.template}
+            onChange={(template) => {
+              setForm((current) => ({
+                ...current,
+                template,
+              }));
+
+              setSaved(false);
+            }}
+          />
+
+          {/* ================= STEP 1 ================= */}
 
           {currentStep === 1 && (
-
             <div className="editor-section">
 
               <h2>
                 Personal Information
               </h2>
 
-
               <PersonalInfoForm
                 form={form}
-                onChange={
-                  handleChange
-                }
+                onChange={handleChange}
               />
 
             </div>
-
           )}
 
-
-          {/* =================================================
-              STEP 2 - SUMMARY
-          ================================================= */}
+          {/* ================= STEP 2 ================= */}
 
           {currentStep === 2 && (
-
             <div className="editor-section">
 
               <h2>
                 Professional Summary
               </h2>
 
-
               <SummaryForm
                 form={form}
-                onChange={
-                  handleChange
-                }
+                onChange={handleChange}
               />
 
             </div>
-
           )}
 
-
-          {/* =================================================
-              STEP 3 - EXPERIENCE
-          ================================================= */}
+          {/* ================= STEP 3 ================= */}
 
           {currentStep === 3 && (
-
             <div className="editor-section">
 
               <ExperienceForm
-
-                experiences={
-                  form.experience
-                }
-
+                experiences={form.experience}
                 experienceForm={
                   experienceForm
                 }
-
-                editingExperienceId={
-                  editingExperienceId
-                }
-
-                isExperienceFormOpen={
-                  isExperienceFormOpen
-                }
-
-                onAdd={() => {
-
-                  setExperienceForm(
-                    emptyExperience
-                  );
-
-                  setEditingExperienceId(
-                    null
-                  );
-
-                  setIsExperienceFormOpen(
-                    true
-                  );
-
-                  setError("");
-
-                }}
-
                 onChange={
                   handleExperienceChange
                 }
-
-                onSave={
-                  handleSaveExperience
+                onAdd={
+                  handleAddExperience
                 }
-
                 onEdit={
                   handleEditExperience
                 }
-
                 onDelete={
                   handleDeleteExperience
                 }
-
+                onSave={
+                  handleSaveExperience
+                }
                 onCancel={
                   handleCancelExperience
                 }
-
+                isExperienceFormOpen={
+                  isExperienceFormOpen
+                }
+                editingExperienceId={
+                  editingExperienceId
+                }
               />
 
             </div>
-
           )}
 
-
-          {/* =================================================
-              STEP 4 - EDUCATION
-          ================================================= */}
+          {/* ================= STEP 4 ================= */}
 
           {currentStep === 4 && (
-
             <div className="editor-section">
 
-              <h2>
-                Education
-              </h2>
-
-
-              <EducationForm
+              <ProjectsForm
                 form={form}
+                onChange={handleChange}
+                projectForm={projectForm}
+                onProjectChange={
+                  handleProjectChange
+                }
+                onAddProject={
+                  handleAddProject
+                }
+                onEditProject={
+                  handleEditProject
+                }
+                onDeleteProject={
+                  handleDeleteProject
+                }
+                onSaveProject={
+                  handleSaveProject
+                }
+                onCancelProject={
+                  handleCancelProject
+                }
+                isProjectFormOpen={
+                  isProjectFormOpen
+                }
+                editingProjectId={
+                  editingProjectId
+                }
               />
 
             </div>
-
           )}
 
-
-          {/* =================================================
-              STEP 5 - SKILLS
-          ================================================= */}
+          {/* ================= STEP 5 ================= */}
 
           {currentStep === 5 && (
-
             <div className="editor-section">
 
               <h2>
                 Skills
               </h2>
 
-
               <SkillsForm
                 form={form}
-                onChange={
-                  handleChange
+                onChange={handleChange}
+              />
+
+            </div>
+          )}
+
+          {/* ================= STEP 6 ================= */}
+
+          {currentStep === 6 && (
+            <div className="editor-section">
+
+              <h2>
+                Education
+              </h2>
+
+              <EducationForm
+                education={form.education}
+                onChange={(education) => {
+                  setForm((previous) => ({
+                    ...previous,
+                    education,
+                  }));
+
+                  setSaved(false);
+                }}
+              />
+
+            </div>
+          )}
+
+          {/* ================= STEP 7 ================= */}
+
+          {currentStep === 7 && (
+            <div className="editor-section">
+
+              <AchievementsForm
+                form={form}
+                achievementForm={
+                  achievementForm
+                }
+                onAchievementChange={
+                  handleAchievementChange
+                }
+                onAddAchievement={
+                  handleAddAchievement
+                }
+                onEditAchievement={
+                  handleEditAchievement
+                }
+                onDeleteAchievement={
+                  handleDeleteAchievement
+                }
+                onSaveAchievement={
+                  handleSaveAchievement
+                }
+                onCancelAchievement={
+                  handleCancelAchievement
+                }
+                isAchievementFormOpen={
+                  isAchievementFormOpen
+                }
+                editingAchievementId={
+                  editingAchievementId
                 }
               />
 
             </div>
-
           )}
 
+          {/* ================= STEP NAVIGATION ================= */}
 
-          {/* =================================================
-              STEP 6 - PROJECTS
-          ================================================= */}
+          <div className="step-navigation">
 
-          {currentStep === 6 && (
+            <button
+              type="button"
+              onClick={
+                handlePreviousStep
+              }
+              disabled={currentStep === 1}
+            >
+              ← Back
+            </button>
 
-            <div className="editor-section">
+            <span>
+              Step {currentStep} of{" "}
+              {totalSteps}
+            </span>
 
-              <h2>
-                Projects
-              </h2>
+            <button
+              type="button"
+              onClick={handleNextStep}
+              disabled={
+                currentStep === totalSteps
+              }
+            >
+              Next →
+            </button>
 
-
-              <ProjectsForm
-                form={form}
-              />
-
-            </div>
-
-          )}
-
-
-          {/* =================================================
-              STEP 7 - CERTIFICATIONS
-          ================================================= */}
-
-          {currentStep === 7 && (
-
-            <div className="editor-section">
-
-              <h2>
-                Certifications
-              </h2>
-
-
-              <CertificationsForm
-                form={form}
-              />
-
-            </div>
-
-          )}
-
-
-          {/* =================================================
-              STEP 8 - LANGUAGES
-          ================================================= */}
-
-          {currentStep === 8 && (
-
-            <div className="editor-section">
-
-              <h2>
-                Languages
-              </h2>
-
-
-              <LanguagesForm
-                form={form}
-              />
-
-            </div>
-
-          )}
+          </div>
 
         </aside>
 
-
-        {/* =================================================
-            RIGHT SIDE - LIVE PREVIEW
-        ================================================= */}
+        {/* ================= RIGHT SIDE ================= */}
 
         <main className="resume-preview-area">
 
+          <div className="resume-paper resume-template-paper">
 
-          <div className="resume-paper">
-
-
-            {/* =================================================
-                NAME
-            ================================================= */}
-
-            <h1>
-
-              {form.firstName ||
-                "Your"}{" "}
-
-              {form.lastName ||
-                "Name"}
-
-            </h1>
-
-
-            {/* =================================================
-                JOB TITLE
-            ================================================= */}
-
-            <h2>
-
-              {form.jobTitle ||
-                "Professional Title"}
-
-            </h2>
-
-
-            {/* =================================================
-                CONTACT
-            ================================================= */}
-
-            <div className="preview-contact">
-
-
-              {form.email && (
-
-                <span>
-                  {form.email}
-                </span>
-
-              )}
-
-
-              {form.phone && (
-
-                <span>
-                  {form.phone}
-                </span>
-
-              )}
-
-
-              {form.location && (
-
-                <span>
-                  {form.location}
-                </span>
-
-              )}
-
-
-              {form.linkedin && (
-
-                <a
-                  href={
-                    form.linkedin
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  LinkedIn
-                </a>
-
-              )}
-
-
-              {form.github && (
-
-                <a
-                  href={
-                    form.github
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  GitHub
-                </a>
-
-              )}
-
-
-              {form.portfolio && (
-
-                <a
-                  href={
-                    form.portfolio
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Portfolio
-                </a>
-
-              )}
-
-            </div>
-
-
-            <hr />
-
-
-            {/* =================================================
-                SUMMARY PREVIEW
-            ================================================= */}
-
-            {form.summary && (
-
-              <section>
-
-                <h3>
-                  PROFESSIONAL SUMMARY
-                </h3>
-
-
-                <p>
-                  {form.summary}
-                </p>
-
-              </section>
-
+            {form.template === "classic" && (
+              <ClassicTemplate
+                form={form}
+                previewExperience={
+                  previewExperience
+                }
+                previewProjects={
+                  previewProjects
+                }
+                previewAchievements={
+                  previewAchievements
+                }
+              />
             )}
 
-
-            {/* =================================================
-                EXPERIENCE PREVIEW
-            ================================================= */}
-
-            {form.experience.length >
-              0 && (
-
-              <section
-                className="resume-section"
-              >
-
-                <h3>
-                  EXPERIENCE
-                </h3>
-
-
-                {form.experience.map(
-                  (experience) => (
-
-                    <div
-                      key={
-                        experience.id
-                      }
-                      className="preview-experience"
-                    >
-
-
-                      <div className="preview-experience-header">
-
-
-                        <div>
-
-                          <h4>
-                            {
-                              experience.position
-                            }
-                          </h4>
-
-
-                          <strong>
-                            {
-                              experience.company
-                            }
-                          </strong>
-
-                        </div>
-
-
-                        <div className="preview-experience-meta">
-
-
-                          {experience.startDate && (
-
-                            <span>
-
-                              {
-                                experience.startDate
-                              }
-
-                              {" – "}
-
-                              {experience.current
-                                ? "Present"
-                                : experience.endDate ||
-                                  ""}
-
-                            </span>
-
-                          )}
-
-
-                          {experience.location && (
-
-                            <span>
-                              {
-                                experience.location
-                              }
-                            </span>
-
-                          )}
-
-                        </div>
-
-                      </div>
-
-
-                      {experience.description && (
-
-                        <p>
-                          {
-                            experience.description
-                          }
-                        </p>
-
-                      )}
-
-                    </div>
-
-                  )
-                )}
-
-              </section>
-
+            {form.template === "modern" && (
+              <ModernTemplate
+                form={form}
+                previewExperience={
+                  previewExperience
+                }
+                previewProjects={
+                  previewProjects
+                }
+                previewAchievements={
+                  previewAchievements
+                }
+              />
             )}
 
-
-            {/* =================================================
-                SKILLS PREVIEW
-            ================================================= */}
-
-            {form.skills && (
-
-              <section>
-
-                <h3>
-                  SKILLS
-                </h3>
-
-
-                <p>
-                  {form.skills}
-                </p>
-
-              </section>
-
+            {form.template === "minimal" && (
+              <MinimalTemplate
+                form={form}
+                previewExperience={
+                  previewExperience
+                }
+                previewProjects={
+                  previewProjects
+                }
+                previewAchievements={
+                  previewAchievements
+                }
+              />
             )}
-
-
-            {/* =================================================
-                EMPTY PREVIEW
-            ================================================= */}
-
-            {!form.summary &&
-              form.experience.length === 0 &&
-              !form.skills && (
-
-                <section>
-
-                  <p>
-                    Your resume preview
-                    will appear here as
-                    you enter information.
-                  </p>
-
-                </section>
-
-              )}
 
           </div>
 
@@ -1643,36 +1213,8 @@ const ResumeEditor = () => {
 
       </div>
 
-
-      {/* ===================================================
-          STEP NAVIGATION
-      =================================================== */}
-
-      <StepNavigation
-
-        currentStep={
-          currentStep
-        }
-
-        totalSteps={
-          totalSteps
-        }
-
-        onPrevious={
-          handlePreviousStep
-        }
-
-        onNext={
-          handleNextStep
-        }
-
-      />
-
     </div>
-
   );
-
 };
-
 
 export default ResumeEditor;

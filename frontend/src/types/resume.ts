@@ -1,3 +1,5 @@
+export type ResumeTemplate = "classic" | "modern" | "minimal";
+
 export interface Experience {
   id: string;
   company: string;
@@ -7,6 +9,14 @@ export interface Experience {
   endDate: string;
   current: boolean;
   description: string;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  organization?: string;
+  date?: string;
+  description?: string;
 }
 
 export interface Education {
@@ -22,17 +32,10 @@ export interface Education {
 export interface Project {
   id: string;
   name: string;
-  description: string;
-  technologies: string;
-  url: string;
-}
-
-export interface Certification {
-  id: string;
-  name: string;
-  issuer: string;
-  date: string;
-  url: string;
+  role?: string;
+  url?: string;
+  description?: string;
+  technologies?: string;
 }
 
 export interface Language {
@@ -43,6 +46,8 @@ export interface Language {
 
 export interface ResumeForm {
   title: string;
+
+  template: ResumeTemplate;
 
   firstName: string;
   lastName: string;
@@ -69,6 +74,9 @@ export interface ResumeForm {
   experience: Experience[];
   education: Education[];
   projects: Project[];
-  certifications: Certification[];
-  languages: Language[];
+  achievements: Achievement[];
+}
+
+export interface Resume extends ResumeForm {
+  id: string;
 }

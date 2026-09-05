@@ -56,11 +56,10 @@ const ExperienceForm = ({
       {experiences.length > 0 && (
         <div className="experience-list">
 
-          {experiences.map((experience) => (
-            <div
-              key={experience.id}
-              className="experience-card"
-            >
+     {experiences.map((experience, index) => (
+  <div
+    key={experience.id || `experience-${index}`}
+  >
 
               <div className="experience-card-content">
 

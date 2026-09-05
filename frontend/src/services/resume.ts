@@ -38,8 +38,8 @@ export interface Resume {
   experience?: ResumeForm["experience"];
   education?: ResumeForm["education"];
   projects?: ResumeForm["projects"];
-  certifications?: ResumeForm["certifications"];
-  languages?: ResumeForm["languages"];
+    achievements?: ResumeForm["achievements"];
+ 
 
   analysis?: {
     atsScore?: number;

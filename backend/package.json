@@ -22,7 +22,8 @@
     "node-fetch": "^3.3.2",
     "openai": "^7.4.0",
     "pdf-parse": "^2.4.5",
-    "pdfkit": "^0.20.1"
+    "pdfkit": "^0.20.1",
+    "puppeteer": "^25.10.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

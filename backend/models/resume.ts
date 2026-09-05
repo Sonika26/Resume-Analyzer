@@ -4,24 +4,31 @@ export interface IResume extends Document {
   userId: mongoose.Types.ObjectId;
 
   title: string;
+  template: "classic" | "modern" | "minimal";
 
-  // Existing Resume Builder fields
+  // =========================
+  // PERSONAL INFORMATION
+  // =========================
   firstName: string;
   lastName: string;
   jobTitle: string;
   email: string;
   phone: string;
   location: string;
-  summary: string;
-  skills: string;
-
-  // Additional personal links
   linkedin: string;
   github: string;
   portfolio: string;
 
-  // Experience
+  // =========================
+  // SUMMARY
+  // =========================
+  summary: string;
+
+  // =========================
+  // EXPERIENCE
+  // =========================
   experience: {
+    id: string;
     company: string;
     position: string;
     location: string;
@@ -31,39 +38,61 @@ export interface IResume extends Document {
     description: string;
   }[];
 
-  // Education
+  // =========================
+  // EDUCATION
+  // =========================
   education: {
+    id: string;
     institution: string;
     degree: string;
     field: string;
+    location: string;
     startDate: string;
     endDate: string;
+    current: boolean;
     description: string;
   }[];
 
-  // Projects
+  // =========================
+  // PROJECTS
+  // =========================
   projects: {
+    id: string;
     name: string;
+    role: string;
     description: string;
     technologies: string;
     url: string;
   }[];
 
-  // Certifications
-  certifications: {
-    name: string;
-    issuer: string;
+  // =========================
+  // ACHIEVEMENTS
+  // =========================
+  achievements: {
+    id: string;
+    title: string;
+    organization: string;
     date: string;
-    url: string;
+    description: string;
   }[];
 
-  // Languages
-  languages: {
-    name: string;
-    level: string;
-  }[];
+  // =========================
+  // SKILLS
+  // =========================
+  skills: string;
 
-  // Resume analysis
+  // =========================
+  // UPLOADED RESUME
+  // =========================
+  originalName?: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
+  extractedText?: string;
+
+  // =========================
+  // ANALYSIS
+  // =========================
   analysis?: {
     atsScore?: number;
     grammarScore?: number;
@@ -73,12 +102,6 @@ export interface IResume extends Document {
     source?: string;
   };
 
-  // Uploaded file information
-  originalName?: string;
-  fileName?: string;
-  fileType?: string;
-  fileSize?: number;
-  extractedText?: string;
 
   createdAt: Date;
   updatedAt: Date;
@@ -86,54 +109,38 @@ export interface IResume extends Document {
 
 const resumeSchema = new Schema<IResume>(
   {
-    /*
-     * OWNER
-     *
-     * Keep this compatible with your existing authentication/controller.
-     */
+    // =========================
+    // OWNER
+    // =========================
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
 
-    /*
-     * RESUME TITLE
-     */
+    // =========================
+    // TITLE
+    // =========================
     title: {
       type: String,
       required: true,
       trim: true,
       default: "My Resume",
     },
-
-    /*
-     * UPLOADED FILE INFORMATION
-     */
-    originalName: {
+     template: {
       type: String,
-      trim: true,
+      enum: [
+        "classic",
+        "modern",
+        "minimal",
+      ],
+      default: "classic",
     },
 
-    fileName: {
-      type: String,
-    },
-
-    fileType: {
-      type: String,
-    },
-
-    fileSize: {
-      type: Number,
-    },
-
-    extractedText: {
-      type: String,
-    },
-
-    /*
-     * EXISTING RESUME BUILDER FIELDS
-     */
+    // =========================
+    // PERSONAL INFORMATION
+    // =========================
     firstName: {
       type: String,
       trim: true,
@@ -170,19 +177,6 @@ const resumeSchema = new Schema<IResume>(
       default: "",
     },
 
-    summary: {
-      type: String,
-      default: "",
-    },
-
-    skills: {
-      type: String,
-      default: "",
-    },
-
-    /*
-     * PERSONAL LINKS
-     */
     linkedin: {
       type: String,
       trim: true,
@@ -201,187 +195,212 @@ const resumeSchema = new Schema<IResume>(
       default: "",
     },
 
-    /*
-     * EXPERIENCE
-     */
-    experience: {
-      type: [
-        {
-          company: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-
-          position: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-
-          location: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-
-          startDate: {
-            type: String,
-            default: "",
-          },
-
-          endDate: {
-            type: String,
-            default: "",
-          },
-
-          current: {
-            type: Boolean,
-            default: false,
-          },
-
-          description: {
-            type: String,
-            default: "",
-          },
-        },
-      ],
-      default: [],
+    // =========================
+    // SUMMARY
+    // =========================
+    summary: {
+      type: String,
+      default: "",
     },
 
-    /*
-     * EDUCATION
-     */
-    education: {
-      type: [
-        {
-          institution: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-
-          degree: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-
-          field: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-
-          startDate: {
-            type: String,
-            default: "",
-          },
-
-          endDate: {
-            type: String,
-            default: "",
-          },
-
-          description: {
-            type: String,
-            default: "",
-          },
+    // =========================
+    // EXPERIENCE
+    // =========================
+    experience: [
+      {
+        id: {
+          type: String,
+          required: true,
         },
-      ],
-      default: [],
+
+        company: {
+          type: String,
+          default: "",
+        },
+
+        position: {
+          type: String,
+          default: "",
+        },
+
+        location: {
+          type: String,
+          default: "",
+        },
+
+        startDate: {
+          type: String,
+          default: "",
+        },
+
+        endDate: {
+          type: String,
+          default: "",
+        },
+
+        current: {
+          type: Boolean,
+          default: false,
+        },
+
+        description: {
+          type: String,
+          default: "",
+        },
+      },
+    ],
+
+    // =========================
+    // EDUCATION
+    // =========================
+    education: [
+      {
+        id: {
+          type: String,
+          required: true,
+        },
+
+        institution: {
+          type: String,
+          default: "",
+        },
+
+        degree: {
+          type: String,
+          default: "",
+        },
+
+        field: {
+          type: String,
+          default: "",
+        },
+
+        location: {
+          type: String,
+          default: "",
+        },
+
+        startDate: {
+          type: String,
+          default: "",
+        },
+
+        endDate: {
+          type: String,
+          default: "",
+        },
+
+        current: {
+          type: Boolean,
+          default: false,
+        },
+
+        description: {
+          type: String,
+          default: "",
+        },
+      },
+    ],
+
+    // =========================
+    // PROJECTS
+    // =========================
+    projects: [
+      {
+        id: {
+          type: String,
+          required: true,
+        },
+
+        name: {
+          type: String,
+          default: "",
+        },
+
+        description: {
+          type: String,
+          default: "",
+        },
+
+        technologies: {
+          type: String,
+          default: "",
+        },
+
+        url: {
+          type: String,
+          default: "",
+        },
+      },
+    ],
+
+    // =========================
+    // ACHIEVEMENTS
+    // =========================
+    achievements: [
+      {
+        id: {
+          type: String,
+          required: true,
+        },
+
+        title: {
+          type: String,
+          default: "",
+        },
+
+        organization: {
+          type: String,
+          default: "",
+        },
+
+        date: {
+          type: String,
+          default: "",
+        },
+
+        description: {
+          type: String,
+          default: "",
+        },
+      },
+    ],
+
+    // =========================
+    // SKILLS
+    // =========================
+    skills: {
+      type: String,
+      default: "",
     },
 
-    /*
-     * PROJECTS
-     */
-    projects: {
-      type: [
-        {
-          name: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-
-          description: {
-            type: String,
-            default: "",
-          },
-
-          technologies: {
-            type: String,
-            default: "",
-          },
-
-          url: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-        },
-      ],
-      default: [],
+    // =========================
+    // UPLOADED FILE
+    // =========================
+    originalName: {
+      type: String,
+      trim: true,
     },
 
-    /*
-     * CERTIFICATIONS
-     */
-    certifications: {
-      type: [
-        {
-          name: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-
-          issuer: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-
-          date: {
-            type: String,
-            default: "",
-          },
-
-          url: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-        },
-      ],
-      default: [],
+    fileName: {
+      type: String,
     },
 
-    /*
-     * LANGUAGES
-     */
-    languages: {
-      type: [
-        {
-          name: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-
-          level: {
-            type: String,
-            default: "",
-            trim: true,
-          },
-        },
-      ],
-      default: [],
+    fileType: {
+      type: String,
     },
 
-    /*
-     * RESUME ANALYSIS
-     */
+    fileSize: {
+      type: Number,
+    },
+
+    extractedText: {
+      type: String,
+    },
+
+    // =========================
+    // ANALYSIS
+    // =========================
     analysis: {
       atsScore: {
         type: Number,
@@ -423,6 +442,9 @@ const resumeSchema = new Schema<IResume>(
   }
 );
 
-const Resume = mongoose.model<IResume>("Resume", resumeSchema);
+const Resume = mongoose.model<IResume>(
+  "Resume",
+  resumeSchema
+);
 
 export default Resume;

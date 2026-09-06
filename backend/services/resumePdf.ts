@@ -175,384 +175,263 @@ const buildClassicHtml = (
 
 <style>
 
-/* =====================================================
-   A4 PAGE
-===================================================== */
+@page { size: A4; margin: 0; }
 
-@page {
-  size: A4;
-  margin: 0;
-}
+* { box-sizing: border-box; }
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   background: #ffffff;
 }
 
 body {
-  font-family:
-    "Times New Roman",
-    Times,
-    serif;
-
-  color: #111111;
-
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  color: #1f2937;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
 
-/* =====================================================
-   MAIN RESUME
-===================================================== */
-
 .resume {
   width: 210mm;
   min-height: 297mm;
-
-  padding:
-    14mm
-    17mm
-    14mm
-    17mm;
-
+  padding: 15mm 16mm 16mm;
   margin: 0 auto;
-
   background: #ffffff;
+  color: #1f2937;
+  line-height: 1.45;
+  overflow: hidden;
+  word-break: normal;
 }
 
-/* =====================================================
-   HEADER
-===================================================== */
-
 .resume-header {
-  text-align: center;
-
-  margin-bottom: 9px;
+  text-align: left;
+  margin-bottom: 0;
 }
 
 .resume-name {
   margin: 0;
-
-  font-size: 18px;
-  line-height: 1.15;
-
-  font-weight: 700;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.3px;
+  color: #111827;
+  font-size: 31px;
+  line-height: 1.08;
+  font-weight: 750;
+  letter-spacing: -0.8px;
+  text-transform: none;
 }
 
 .resume-title {
-  margin-top: 2px;
-
-  font-size: 11px;
+  margin: 7px 0 13px;
+  color: #4b5563;
+  font-size: 13px;
   line-height: 1.3;
-
-  font-weight: 400;
+  font-weight: 500;
+  letter-spacing: 0.15px;
 }
 
 .resume-contact {
-  margin-top: 5px;
-
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
-
-  gap: 0 5px;
-
-  font-size: 8.5px;
-  line-height: 1.4;
+  gap: 4px 13px;
+  color: #5f6875;
+  font-size: 9.5px;
+  line-height: 1.45;
 }
 
 .resume-contact span,
 .resume-contact a {
-  color: #111111;
-
+  color: #5f6875;
   text-decoration: none;
+  white-space: nowrap;
 }
 
-.contact-separator {
-  margin: 0 1px;
-}
-
-/* =====================================================
-   HEADER LINE
-===================================================== */
+.contact-separator { margin: 0; }
 
 .resume-header-divider {
   width: 100%;
-
   height: 1px;
-
-  margin-top: 7px;
-
-  background: #111111;
+  margin: 17px 0 21px;
+  background: #cfd4da;
 }
 
-/* =====================================================
-   SECTIONS
-===================================================== */
-
 .resume-section {
-  margin-top: 11px;
-
+  margin: 0 0 22px;
   break-inside: avoid;
 }
 
+.resume-section:last-child { margin-bottom: 0; }
+
 .resume-section-title {
-  margin: 0 0 5px;
-
-  padding-bottom: 2px;
-
-  border-bottom: 1px solid #555555;
-
+  margin: 0 0 9px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #d9dde3;
+  color: #1f2937;
   font-size: 10px;
-
   line-height: 1.25;
-
-  font-weight: 700;
-
-  letter-spacing: 0.6px;
-
+  font-weight: 750;
+  letter-spacing: 1.35px;
   text-transform: uppercase;
 }
 
-/* =====================================================
-   SUMMARY
-===================================================== */
-
 .resume-summary {
   margin: 0;
-
-  font-size: 9.2px;
-
-  line-height: 1.45;
-
+  color: #4b5563;
+  font-size: 10px;
+  line-height: 1.6;
   text-align: left;
 }
 
-/* =====================================================
-   EXPERIENCE
-===================================================== */
-
 .resume-entry {
-  margin-bottom: 7px;
-
+  margin: 0 0 17px;
   break-inside: avoid;
 }
 
-.resume-entry:last-child {
-  margin-bottom: 0;
-}
+.resume-entry:last-child { margin-bottom: 0; }
 
 .resume-entry-header {
   display: flex;
-
   justify-content: space-between;
-
   align-items: flex-start;
-
-  gap: 10px;
+  gap: 20px;
+  margin-bottom: 5px;
 }
 
-.resume-entry-main {
-  min-width: 0;
-}
+.resume-entry-main { min-width: 0; }
 
 .resume-entry-title {
-  margin: 0;
-
-  font-size: 10px;
-
-  line-height: 1.25;
-
-  font-weight: 700;
+  margin: 0 0 2px;
+  color: #111827;
+  font-size: 11.5px;
+  line-height: 1.3;
+  font-weight: 750;
 }
 
 .resume-entry-company {
-  margin-top: 1px;
-
-  font-size: 9px;
-
-  line-height: 1.25;
-
-  font-weight: 700;
+  display: block;
+  margin-top: 0;
+  color: #596273;
+  font-size: 9.8px;
+  line-height: 1.35;
+  font-weight: 600;
 }
 
 .resume-entry-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
   flex-shrink: 0;
-
+  color: #6b7280;
+  font-size: 8.8px;
+  line-height: 1.4;
   text-align: right;
-
-  font-size: 8.5px;
-
-  line-height: 1.3;
 }
 
-/* =====================================================
-   BULLETS
-===================================================== */
-
 .resume-bullets {
-  margin: 3px 0 0;
-
-  padding-left: 15px;
+  margin: 5px 0 0;
+  padding-left: 17px;
 }
 
 .resume-bullets li {
-  margin-bottom: 1px;
-
+  margin-bottom: 2px;
   padding-left: 1px;
-
-  font-size: 8.8px;
-
-  line-height: 1.35;
+  color: #4b5563;
+  font-size: 9.7px;
+  line-height: 1.58;
 }
 
-.resume-bullets li:last-child {
-  margin-bottom: 0;
-}
-
-/* =====================================================
-   PROJECTS
-===================================================== */
+.resume-bullets li:last-child { margin-bottom: 0; }
 
 .project-title {
-  margin: 0;
-
-  font-size: 10px;
-
-  line-height: 1.25;
-
-  font-weight: 700;
+  margin: 0 0 3px;
+  color: #111827;
+  font-size: 11.5px;
+  line-height: 1.35;
+  font-weight: 750;
 }
 
 .project-role {
-  margin-top: 1px;
-
-  font-size: 8.8px;
-
-  font-weight: 400;
+  color: #596273;
+  font-size: 9.5px;
+  font-weight: 600;
 }
 
 .project-technologies {
-  margin-top: 1px;
-
-  font-size: 8.6px;
-
-  line-height: 1.3;
+  margin-top: 2px;
+  color: #5f6875;
+  font-size: 9.2px;
+  line-height: 1.5;
 }
+
+.project-technologies strong { color: #374151; font-weight: 650; }
 
 .project-link {
   display: inline-block;
-
   margin-top: 1px;
-
-  font-size: 8.3px;
-
-  color: #111111;
-
+  color: #4b5563;
+  font-size: 9px;
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
-
-/* =====================================================
-   SKILLS
-===================================================== */
 
 .skills-text {
   margin: 0;
-
-  font-size: 8.8px;
-
-  line-height: 1.45;
-
+  color: #4b5563;
+  font-size: 10px;
+  line-height: 1.6;
   white-space: pre-line;
 }
 
-/* =====================================================
-   EDUCATION
-===================================================== */
-
 .education-degree {
-  margin: 0;
-
-  font-size: 10px;
-
-  line-height: 1.25;
-
-  font-weight: 700;
+  margin: 0 0 3px;
+  color: #111827;
+  font-size: 11.5px;
+  line-height: 1.35;
+  font-weight: 750;
 }
 
 .education-institution {
-  margin-top: 1px;
-
-  font-size: 8.8px;
-
-  line-height: 1.3;
-
-  font-weight: 400;
+  display: block;
+  margin-top: 0;
+  color: #596273;
+  font-size: 9.7px;
+  line-height: 1.4;
+  font-weight: 600;
 }
 
 .education-meta {
-  margin-top: 1px;
-
-  font-size: 8.5px;
-
-  line-height: 1.3;
-}
-
-.education-description {
   margin-top: 2px;
-
-  font-size: 8.7px;
-
-  line-height: 1.35;
+  color: #6b7280;
+  font-size: 8.8px;
+  line-height: 1.4;
 }
 
-/* =====================================================
-   ACHIEVEMENTS
-===================================================== */
+.education-description,
+.achievement-description {
+  margin-top: 4px;
+  color: #4b5563;
+  font-size: 9.5px;
+  line-height: 1.55;
+}
 
 .achievement-title {
+  display: inline;
   margin: 0;
-
-  font-size: 9.8px;
-
-  line-height: 1.25;
-
-  font-weight: 700;
+  color: #111827;
+  font-size: 10.8px;
+  line-height: 1.4;
+  font-weight: 750;
 }
 
 .achievement-meta {
   margin-top: 1px;
-
-  font-size: 8.5px;
+  color: #6b7280;
+  font-size: 9px;
 }
-
-.achievement-description {
-  margin-top: 2px;
-
-  font-size: 8.7px;
-
-  line-height: 1.35;
-}
-
-/* =====================================================
-   PAGE CONTROL
-===================================================== */
 
 .resume-section,
-.resume-entry {
-  page-break-inside: avoid;
-}
+.resume-entry { page-break-inside: avoid; }
 
 </style>
 </head>
@@ -1013,30 +892,15 @@ const buildModernHtml = (
 
 <style>
 
-@page {
-  size: A4;
-  margin: 0;
-}
+@page { size: A4; margin: 0; }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: white;
-}
+html, body { margin: 0; padding: 0; background: #ffffff; }
 
 body {
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
   color: #1f2937;
-
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -1044,334 +908,129 @@ body {
 .resume {
   width: 210mm;
   min-height: 297mm;
-
-  padding: 13mm 15mm;
-
-  background: white;
+  padding: 15mm 16mm 16mm;
+  background: #ffffff;
+  line-height: 1.45;
+  overflow: hidden;
+  word-break: normal;
 }
-
-/* HEADER */
 
 .modern-header {
   border-bottom: 2px solid #111827;
-
-  padding-bottom: 9px;
-
-  margin-bottom: 12px;
+  padding-bottom: 12px;
+  margin-bottom: 18px;
 }
 
 .modern-header-main {
   display: flex;
-
   justify-content: space-between;
-
   align-items: flex-start;
-
-  gap: 20px;
+  gap: 24px;
 }
 
 .modern-name {
-  font-size: 24px;
-
-  line-height: 1.1;
-
-  font-weight: 700;
-
-  letter-spacing: -0.5px;
-
+  font-size: 31px;
+  line-height: 1.08;
+  font-weight: 750;
+  letter-spacing: -0.8px;
   color: #111827;
 }
 
 .modern-job-title {
-  margin-top: 4px;
-
-  font-size: 11px;
-
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.3;
   color: #4b5563;
+  font-weight: 500;
 }
 
 .modern-contact {
   max-width: 48%;
-
   text-align: right;
-
-  font-size: 8.5px;
-
+  font-size: 9.5px;
   line-height: 1.55;
-
-  color: #4b5563;
+  color: #5f6875;
 }
 
-.modern-contact div {
-  margin-bottom: 1px;
-}
-
-.modern-contact a {
-  color: #374151;
-
-  text-decoration: none;
-}
-
-/* LAYOUT */
+.modern-contact div { margin-bottom: 2px; }
+.modern-contact a { color: #374151; text-decoration: none; }
 
 .modern-layout {
   display: grid;
-
-  grid-template-columns:
-    38mm 1fr;
-
+  grid-template-columns: 44mm 1fr;
   gap: 11mm;
 }
 
-/* SIDEBAR */
-
 .modern-sidebar {
   border-right: 1px solid #d1d5db;
-
   padding-right: 7mm;
 }
 
-.modern-sidebar-section {
-  margin-bottom: 13px;
-}
+.modern-sidebar-section { margin-bottom: 20px; }
 
 .modern-sidebar-title {
-  margin: 0 0 5px;
-
-  font-size: 9px;
-
-  font-weight: 700;
-
-  letter-spacing: 1px;
-
+  margin: 0 0 9px;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 1.35px;
   text-transform: uppercase;
-
-  color: #111827;
+  color: #1f2937;
 }
 
 .modern-sidebar-text {
   margin: 0;
-
-  font-size: 8.5px;
-
-  line-height: 1.5;
-
+  font-size: 10px;
+  line-height: 1.6;
   color: #4b5563;
-
   white-space: pre-line;
 }
 
-.modern-education-item {
-  margin-bottom: 8px;
-}
+.modern-education-item { margin-bottom: 14px; }
+.modern-education-degree { font-size: 10px; font-weight: 750; line-height: 1.4; }
+.modern-education-institution { margin-top: 3px; font-size: 9.5px; line-height: 1.4; color: #596273; }
+.modern-education-date { margin-top: 3px; font-size: 8.8px; color: #6b7280; }
 
-.modern-education-degree {
-  font-size: 8.8px;
-
-  font-weight: 700;
-
-  line-height: 1.35;
-}
-
-.modern-education-institution {
-  margin-top: 2px;
-
-  font-size: 8.2px;
-
-  line-height: 1.35;
-
-  color: #4b5563;
-}
-
-.modern-education-date {
-  margin-top: 2px;
-
-  font-size: 7.8px;
-
-  color: #6b7280;
-}
-
-/* MAIN */
-
-.modern-main {
-  min-width: 0;
-}
-
-.modern-section {
-  margin-bottom: 13px;
-
-  break-inside: avoid;
-}
+.modern-main { min-width: 0; }
+.modern-section { margin-bottom: 22px; break-inside: avoid; }
 
 .modern-section-title {
-  margin: 0 0 6px;
-
+  margin: 0 0 9px;
+  padding-bottom: 5px;
   font-size: 10px;
-
-  line-height: 1.2;
-
-  font-weight: 700;
-
-  letter-spacing: 1px;
-
+  line-height: 1.25;
+  font-weight: 750;
+  letter-spacing: 1.35px;
   text-transform: uppercase;
-
-  color: #111827;
+  color: #1f2937;
+  border-bottom: 1px solid #d9dde3;
 }
 
 .modern-section-title::after {
   content: "";
-
   display: block;
-
   width: 28px;
-
   height: 2px;
-
-  margin-top: 3px;
-
+  margin-top: 5px;
   background: #111827;
 }
 
-.modern-summary {
-  margin: 0;
-
-  font-size: 8.9px;
-
-  line-height: 1.55;
-
-  color: #4b5563;
-}
-
-/* EXPERIENCE */
-
-.modern-entry {
-  margin-bottom: 10px;
-
-  break-inside: avoid;
-}
-
-.modern-entry-header {
-  display: flex;
-
-  justify-content: space-between;
-
-  gap: 10px;
-}
-
-.modern-entry-title {
-  margin: 0;
-
-  font-size: 9.8px;
-
-  font-weight: 700;
-
-  line-height: 1.3;
-
-  color: #111827;
-}
-
-.modern-entry-company {
-  margin-top: 1px;
-
-  font-size: 8.7px;
-
-  font-weight: 600;
-
-  color: #4b5563;
-}
-
-.modern-entry-date {
-  flex-shrink: 0;
-
-  font-size: 8px;
-
-  text-align: right;
-
-  color: #6b7280;
-}
-
-.modern-entry-location {
-  margin-top: 1px;
-
-  font-size: 7.8px;
-
-  color: #6b7280;
-}
-
-.modern-bullets {
-  margin: 4px 0 0;
-
-  padding-left: 14px;
-}
-
-.modern-bullets li {
-  margin-bottom: 2px;
-
-  font-size: 8.4px;
-
-  line-height: 1.4;
-
-  color: #4b5563;
-}
-
-/* PROJECTS */
-
-.modern-project-name {
-  margin: 0;
-
-  font-size: 9.7px;
-
-  font-weight: 700;
-}
-
-.modern-project-tech {
-  margin-top: 2px;
-
-  font-size: 8px;
-
-  color: #6b7280;
-}
-
-.modern-project-role {
-  margin-top: 1px;
-
-  font-size: 8px;
-
-  color: #6b7280;
-}
-
-.modern-project-link {
-  font-size: 7.8px;
-
-  color: #374151;
-
-  text-decoration: underline;
-}
-
-/* ACHIEVEMENTS */
-
-.modern-achievement-title {
-  font-size: 9px;
-
-  font-weight: 700;
-}
-
-.modern-achievement-meta {
-  margin-top: 1px;
-
-  font-size: 8px;
-
-  color: #6b7280;
-}
-
-.modern-achievement-description {
-  margin-top: 2px;
-
-  font-size: 8.3px;
-
-  line-height: 1.4;
-}
+.modern-summary { margin: 0; font-size: 10px; line-height: 1.6; color: #4b5563; }
+.modern-entry { margin-bottom: 17px; break-inside: avoid; }
+.modern-entry-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 5px; }
+.modern-entry-title { margin: 0 0 2px; font-size: 11.5px; font-weight: 750; line-height: 1.3; color: #111827; }
+.modern-entry-company { margin-top: 0; font-size: 9.8px; line-height: 1.35; font-weight: 600; color: #596273; }
+.modern-entry-date { flex-shrink: 0; font-size: 8.8px; line-height: 1.4; text-align: right; color: #6b7280; }
+.modern-entry-location { margin-top: 1px; font-size: 8.8px; color: #6b7280; }
+.modern-bullets { margin: 5px 0 0; padding-left: 17px; }
+.modern-bullets li { margin-bottom: 2px; font-size: 9.7px; line-height: 1.58; color: #4b5563; }
+.modern-project-name { margin: 0 0 3px; font-size: 11.5px; font-weight: 750; line-height: 1.35; color: #111827; }
+.modern-project-tech { margin-top: 2px; font-size: 9.2px; line-height: 1.5; color: #5f6875; }
+.modern-project-tech strong { color: #374151; font-weight: 650; }
+.modern-project-role { margin-top: 1px; font-size: 9.5px; color: #596273; }
+.modern-project-link { font-size: 9px; color: #4b5563; text-decoration: underline; text-underline-offset: 2px; }
+.modern-achievement-title { font-size: 10.8px; font-weight: 750; line-height: 1.4; color: #111827; }
+.modern-achievement-meta { margin-top: 1px; font-size: 9px; color: #6b7280; }
+.modern-achievement-description { margin-top: 4px; font-size: 9.5px; line-height: 1.55; color: #4b5563; }
 
 </style>
 </head>
@@ -1943,30 +1602,15 @@ const buildMinimalHtml = (
 
 <style>
 
-@page {
-  size: A4;
-  margin: 0;
-}
+@page { size: A4; margin: 0; }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: white;
-}
+html, body { margin: 0; padding: 0; background: #ffffff; }
 
 body {
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-  color: #222222;
-
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  color: #1f2937;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -1974,191 +1618,33 @@ body {
 .resume {
   width: 210mm;
   min-height: 297mm;
-
-  padding:
-    17mm
-    20mm
-    16mm
-    20mm;
-
-  background: white;
+  padding: 15mm 16mm 16mm;
+  background: #ffffff;
+  line-height: 1.45;
+  overflow: hidden;
+  word-break: normal;
 }
 
-/* HEADER */
-
-.minimal-header {
-  text-align: center;
-
-  margin-bottom: 16px;
-}
-
-.minimal-name {
-  margin: 0;
-
-  font-size: 20px;
-
-  line-height: 1.15;
-
-  font-weight: 700;
-
-  letter-spacing: 1px;
-
-  text-transform: uppercase;
-}
-
-.minimal-title {
-  margin-top: 4px;
-
-  font-size: 10px;
-
-  color: #555555;
-}
-
-.minimal-contact {
-  margin-top: 6px;
-
-  font-size: 8px;
-
-  line-height: 1.4;
-
-  color: #555555;
-}
-
-.minimal-contact a {
-  color: #333333;
-
-  text-decoration: none;
-}
-
-/* SECTION */
-
-.minimal-section {
-  margin-top: 13px;
-
-  break-inside: avoid;
-}
-
-.minimal-section-title {
-  margin: 0 0 7px;
-
-  font-size: 9.5px;
-
-  font-weight: 700;
-
-  letter-spacing: 1.2px;
-
-  text-transform: uppercase;
-
-  color: #333333;
-}
-
-.minimal-section-title::before {
-  content: "";
-
-  display: inline-block;
-
-  width: 22px;
-
-  height: 1px;
-
-  margin-right: 6px;
-
-  margin-bottom: 3px;
-
-  background: #333333;
-}
-
-/* TEXT */
-
-.minimal-text {
-  margin: 0;
-
-  font-size: 8.8px;
-
-  line-height: 1.55;
-
-  color: #444444;
-}
-
-/* ENTRIES */
-
-.minimal-entry {
-  margin-bottom: 9px;
-
-  break-inside: avoid;
-}
-
-.minimal-entry-title {
-  margin: 0;
-
-  font-size: 9.5px;
-
-  line-height: 1.3;
-
-  font-weight: 700;
-}
-
-.minimal-entry-company {
-  margin-top: 1px;
-
-  font-size: 8.6px;
-
-  font-weight: 600;
-}
-
-.minimal-entry-meta {
-  margin-top: 1px;
-
-  font-size: 8px;
-
-  color: #666666;
-}
-
-.minimal-bullets {
-  margin: 3px 0 0;
-
-  padding-left: 14px;
-}
-
-.minimal-bullets li {
-  margin-bottom: 2px;
-
-  font-size: 8.5px;
-
-  line-height: 1.4;
-
-  color: #444444;
-}
-
-/* PROJECT */
-
-.minimal-project-title {
-  margin: 0;
-
-  font-size: 9.5px;
-
-  font-weight: 700;
-}
-
-.minimal-project-tech {
-  margin-top: 2px;
-
-  font-size: 8px;
-
-  color: #666666;
-}
-
-.minimal-project-link {
-  display: inline-block;
-
-  margin-top: 1px;
-
-  font-size: 7.8px;
-
-  color: #333333;
-
-  text-decoration: underline;
-}
+.minimal-header { text-align: center; margin-bottom: 20px; }
+.minimal-name { margin: 0; font-size: 31px; line-height: 1.08; font-weight: 750; letter-spacing: -0.8px; color: #111827; text-transform: none; }
+.minimal-title { margin-top: 7px; font-size: 13px; line-height: 1.3; color: #4b5563; font-weight: 500; }
+.minimal-contact { margin-top: 9px; font-size: 9.5px; line-height: 1.45; color: #5f6875; }
+.minimal-contact a { color: #374151; text-decoration: none; }
+
+.minimal-section { margin-top: 0; margin-bottom: 22px; break-inside: avoid; }
+.minimal-section-title { margin: 0 0 9px; padding-bottom: 5px; border-bottom: 1px solid #d9dde3; font-size: 10px; line-height: 1.25; font-weight: 750; letter-spacing: 1.35px; text-transform: uppercase; color: #1f2937; }
+.minimal-section-title::before { content: ""; display: inline-block; width: 28px; height: 2px; margin-right: 7px; margin-bottom: 3px; background: #111827; }
+.minimal-text { margin: 0; font-size: 10px; line-height: 1.6; color: #4b5563; }
+.minimal-entry { margin-bottom: 17px; break-inside: avoid; }
+.minimal-entry-title { margin: 0 0 3px; font-size: 11.5px; line-height: 1.35; font-weight: 750; color: #111827; }
+.minimal-entry-company { margin-top: 0; font-size: 9.8px; line-height: 1.35; font-weight: 600; color: #596273; }
+.minimal-entry-meta { margin-top: 2px; font-size: 8.8px; line-height: 1.4; color: #6b7280; }
+.minimal-bullets { margin: 5px 0 0; padding-left: 17px; }
+.minimal-bullets li { margin-bottom: 2px; font-size: 9.7px; line-height: 1.58; color: #4b5563; }
+.minimal-project-title { margin: 0 0 3px; font-size: 11.5px; line-height: 1.35; font-weight: 750; color: #111827; }
+.minimal-project-tech { margin-top: 2px; font-size: 9.2px; line-height: 1.5; color: #5f6875; }
+.minimal-project-tech strong { color: #374151; font-weight: 650; }
+.minimal-project-link { display: inline-block; margin-top: 2px; font-size: 9px; color: #4b5563; text-decoration: underline; text-underline-offset: 2px; }
 
 </style>
 </head>
@@ -2782,4 +2268,4 @@ export const generateResumePdf = async (
     await browser.close();
 
   }
-};
+}

@@ -161,6 +161,10 @@ const ResumeEditor = () => {
         setError("");
 
         const resume = await getResumeById(id);
+        console.log("RESUME FROM API:", resume);
+       console.log("LINKEDIN:", resume.linkedin);
+       console.log("GITHUB:", resume.github);
+       console.log("PORTFOLIO:", resume.portfolio);
 
         setForm({
           

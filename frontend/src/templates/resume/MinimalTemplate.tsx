@@ -52,7 +52,7 @@ const MinimalTemplate = ({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                LinkedIn
+                {form.linkedin}
               </a>
             )}
 
@@ -62,7 +62,7 @@ const MinimalTemplate = ({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                GitHub
+                {form.github}
               </a>
             )}
 
@@ -72,7 +72,7 @@ const MinimalTemplate = ({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Portfolio
+                {form.portfolio}
               </a>
             )}
           </div>

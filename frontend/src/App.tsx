@@ -7,6 +7,7 @@ import Analyze from "./pages/Analyze";
 import Resume from "./pages/Resume";
 import Layout from "./components/Layout";
 import ResumeEditor from "./pages/ResumeEditor";
+import CoverLetterPage from "./pages/CoverLetterPage";
 import "./App.css";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <Route path="/analyze" element={<Analyze />} />
         <Route path="/resume" element={<Resume />} />
          <Route path="/resume/new" element={<ResumeEditor />}/>
+         <Route path="/coverletter" element={<CoverLetterPage />} />
       <Route path="/resume/:id/edit"  element={<ResumeEditor />}/>
       </Route>
     </Routes>

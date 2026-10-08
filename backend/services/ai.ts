@@ -1,58 +1,99 @@
 import dotenv from "dotenv";
 dotenv.config({ path: __dirname + "/../.env" });
 
+import { GoogleGenAI } from "@google/genai";
 
-
-import OpenAI from "openai";
 import { calculateATS } from "./ats";
 import { checkGrammar } from "./grammar";
 import { checkFormatting } from "./formatting";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
-export async function analyzeResumeAI(resumeText: string): Promise<any> {
+export async function analyzeResumeAI(
+  resumeText: string
+): Promise<any> {
   try {
-    // Try OpenAI first
     const prompt = `
-      Analyze this resume text and return a JSON object with:
-      - atsScore (0–100)
-      - grammarScore (0–100)
-      - formattingScore (0–100)
-      - overallScore (0–100, average of the above)
-      - suggestions (array of 5 strings)
+Analyze the following resume.
 
-      Resume:
-      ${resumeText}
-    `;
+Return ONLY a valid JSON object with exactly these fields:
 
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-    });
+{
+  "atsScore": number,
+  "grammarScore": number,
+  "formattingScore": number,
+  "overallScore": number,
+  "suggestions": [
+    "string",
+    "string",
+    "string",
+    "string",
+    "string"
+  ]
+}
 
-   const output = response.choices[0].message.content ?? "{}";
-return JSON.parse(output);
+Rules:
 
+- atsScore must be between 0 and 100.
+- grammarScore must be between 0 and 100.
+- formattingScore must be between 0 and 100.
+- overallScore must be the average of atsScore, grammarScore and formattingScore, rounded to the nearest integer.
+- suggestions must contain exactly 5 useful resume improvement suggestions.
+- Do not include markdown.
+- Do not include code fences.
+- Return valid JSON only.
+
+Resume:
+
+${resumeText}
+`;
+
+   const response = await ai.models.generateContent({
+  model: "gemini-3.5-flash-lite",
+  contents: prompt,
+});
+
+    const output = response.text ?? "{}";
+
+    // Remove accidental markdown code fences if Gemini adds them
+    const cleanedOutput = output
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    return JSON.parse(cleanedOutput);
 
   } catch (error) {
-    console.error("OpenAI failed, switching to fallbacks:", error);
+    console.error("Gemini failed, switching to fallbacks:", error);
 
-    // Fallback logic
+    // Existing fallback logic
     const atsScore = calculateATS(resumeText);
-    const grammarScore = await checkGrammar(resumeText);
-    const formattingScore = checkFormatting(resumeText);
-    const overallScore = Math.round((atsScore + grammarScore + formattingScore) / 3);
 
-    // Basic suggestions (could use Hugging Face/Cohere here)
+    const grammarScore = await checkGrammar(resumeText);
+
+    const formattingScore = checkFormatting(resumeText);
+
+    const overallScore = Math.round(
+      (atsScore + grammarScore + formattingScore) / 3
+    );
+
     const suggestions = [
       "Add a summary section",
       "Use consistent bullet points",
       "Highlight measurable achievements",
       "Reduce passive voice",
-      "Add relevant technical skills"
+      "Add relevant technical skills",
     ];
 
-    return { atsScore, grammarScore, formattingScore, overallScore, suggestions, source: "Fallback" };
+    return {
+      atsScore,
+      grammarScore,
+      formattingScore,
+      overallScore,
+      suggestions,
+      source: "Fallback",
+    };
   }
 }

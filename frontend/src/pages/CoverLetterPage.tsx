@@ -6,6 +6,7 @@ import {
   Sparkles,
   RefreshCw,
 } from "lucide-react";
+import { generateCoverLetter } from "../services/coverLetterApi";
 
 const MAX_CHARACTERS = 5000;
 
@@ -15,32 +16,25 @@ const CoverLetterPage = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
-  const handleGenerate = async () => {
-    if (!jobDescription.trim()) {
-      return;
-    }
 
-    setIsGenerating(true);
+const [error, setError] = useState("");
 
-    // Temporary mock generation.
-    // We will replace this with the Express API in Phase 2.
-    setTimeout(() => {
-      setCoverLetter(
-        `Dear Hiring Manager,
+const handleGenerate = async () => {
+  if (!jobDescription.trim()) {
+    return;
+  }
 
-I am writing to express my interest in the position described in your job posting. I am particularly interested in this opportunity because of the responsibilities and requirements outlined for the role.
+  setIsGenerating(true);
+  setError("");
 
-The position presents an exciting opportunity to contribute to a professional team while applying relevant skills to meaningful projects. I am especially drawn to the collaborative environment and the opportunity to contribute to the goals described in the job description.
-
-Thank you for considering my application. I would welcome the opportunity to discuss the position and how I could contribute to your team.
-
-Sincerely,
-Your Name`
-      );
-
-      setIsGenerating(false);
-    }, 1500);
-  };
+  try {
+    const result = await generateCoverLetter(jobDescription);
+    setCoverLetter(result);
+  } catch (err) {
+    console.error(err);
+    setError("Failed to generate cover letter. Please try again.");
+  }
+};
 
   const handleCopy = async () => {
     if (!coverLetter) return;
@@ -151,6 +145,12 @@ Your Name`
                 </>
               )}
             </button>
+
+            {error && (
+              <p className="mt-3 text-sm text-red-500" role="alert">
+                {error}
+              </p>
+            )}
           </section>
 
           {/* Cover Letter Output */}

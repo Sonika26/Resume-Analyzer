@@ -11,6 +11,177 @@
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.5;
 }
+.template-selector {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+/* Closed dropdown */
+.template-dropdown-button {
+  width: 100%;
+  min-height: 58px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #ffffff;
+  border: 1px solid #d9dee8;
+  border-radius: 10px;
+
+  cursor: pointer;
+  text-align: left;
+  color: #172033;
+}
+
+.template-dropdown-button:hover {
+  border-color: #aeb6c5;
+}
+
+.template-dropdown-button > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.template-dropdown-button strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.template-dropdown-button span {
+  font-size: 12px;
+  color: #70798a;
+}
+
+/* Arrow */
+.template-dropdown-arrow {
+  font-size: 11px !important;
+  color: #172033 !important;
+  transition: transform 0.2s ease;
+}
+
+.template-dropdown-arrow-open {
+  transform: rotate(180deg);
+}
+
+/* Open options */
+.template-selector-options {
+  margin-top: 8px;
+  padding: 8px;
+
+  background: #ffffff;
+  border: 1px solid #d9dee8;
+  border-radius: 10px;
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Individual template */
+.template-option {
+  width: 100%;
+  padding: 8px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  cursor: pointer;
+  text-align: left;
+}
+
+.template-option:hover {
+  background: #f6f7f9;
+  border-color: #e1e5eb;
+}
+
+.template-option-active {
+  background: #f5f6f8;
+  border-color: #172033;
+}
+
+/* Mini preview */
+.template-option-preview {
+  width: 45px;
+  height: 58px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f1f2f4;
+  border-radius: 5px;
+}
+
+.template-mini-preview {
+  width: 28px;
+  height: 42px;
+  padding: 5px;
+
+  background: #ffffff;
+  border: 1px solid #d5d8dd;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.template-mini-preview span {
+  display: block;
+  height: 3px;
+  background: #c9cdd3;
+}
+
+.template-mini-preview span:first-child {
+  width: 70%;
+  height: 5px;
+  background: #444b55;
+}
+
+/* Template information */
+.template-option-info {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.template-option-info strong {
+  font-size: 13px;
+  color: #172033;
+}
+
+.template-option-info small {
+  font-size: 11px;
+  color: #7a8392;
+}
+
+/* Selected check */
+.template-selected {
+  width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: #222831;
+  color: #ffffff !important;
+
+  font-size: 12px !important;
+  font-weight: 700;
+}
 
 /* =========================================================
    CLASSIC RESUME TEMPLATE

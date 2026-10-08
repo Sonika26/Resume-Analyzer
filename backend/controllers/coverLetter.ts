@@ -13,7 +13,6 @@ export const generateCoverLetterController = async (
         success: false,
         message: "Job description is required.",
       });
-
       return;
     }
 
@@ -24,16 +23,14 @@ export const generateCoverLetterController = async (
         success: false,
         message: "Please provide a valid job description.",
       });
-
       return;
     }
 
     if (trimmedJobDescription.length > 5000) {
       res.status(400).json({
         success: false,
-        message: "Job description is too long.",
+        message: "Job description cannot exceed 5000 characters.",
       });
-
       return;
     }
 
@@ -46,11 +43,14 @@ export const generateCoverLetterController = async (
       coverLetter,
     });
   } catch (error) {
-    console.error("Cover letter generation error:", error);
+    console.error("Cover letter generation failed:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to generate cover letter.",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to generate cover letter.",
     });
   }
 };

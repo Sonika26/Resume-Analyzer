@@ -27,7 +27,17 @@ export default function AnalyzeResume() {
     formData.append("resume", resume);
 
     try {
-      const response = await apiResume.post("/analyze", formData);
+      const token = localStorage.getItem("token");
+
+      const response = await apiResume.post(
+        "/analyze",
+        formData,
+      {
+         headers: {
+          Authorization: `Bearer ${token}`,
+       },
+      }
+     );
       const result = response.data;
 
       console.log("Analysis Result:", result);

@@ -10,6 +10,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
   }
 
   if (!token) {
+    console.log("no authorization");
     return res.status(401).json({ message: "Not authorized, no token" });
   }
 
@@ -23,3 +24,4 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
     return res.status(401).json({ message: "Token failed or expired" });
   }
 };
+export default protect;

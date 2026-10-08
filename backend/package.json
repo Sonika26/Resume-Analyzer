@@ -11,6 +11,7 @@
   "keywords": [],
   "type": "commonjs",
   "dependencies": {
+    "@google/genai": "^2.24.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -20,8 +21,9 @@
     "mongoose": "^9.9.1",
     "multer": "^2.2.0",
     "node-fetch": "^3.3.2",
-    "openai": "^7.4.0",
-    "pdf-parse": "^2.4.5"
+    "pdf-parse": "^2.4.5",
+    "pdfkit": "^0.20.1",
+    "puppeteer": "^25.10.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -31,6 +33,7 @@
     "@types/mongoose": "^5.11.96",
     "@types/multer": "^2.2.0",
     "@types/node": "^26.1.2",
+    "@types/pdfkit": "^0.17.6",
     "ts-node": "^10.9.2"
   }
 }

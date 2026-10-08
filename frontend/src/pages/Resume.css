@@ -1,0 +1,172 @@
+
+.resumes-page {
+  width: 100%;
+  min-height: 100vh;
+
+  padding: 36px;
+
+  background: #f8fafc;
+}
+
+.resumes-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-bottom: 36px;
+}
+
+.resumes-header h1 {
+  margin: 0;
+
+  color: #1f2937;
+
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.resumes-header p {
+  max-width: 760px;
+
+  margin-top: 8px;
+
+  color: #6b7280;
+
+  line-height: 1.6;
+}
+
+.new-resume-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-width: 170px;
+
+  padding: 14px 22px;
+
+  border: none;
+  border-radius: 14px;
+
+  color: white;
+
+  background: linear-gradient(
+    135deg,
+    #6656d8,
+    #5142bd
+  );
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 16px rgba(91, 76, 196, 0.25);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.new-resume-button span {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.new-resume-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 24px rgba(91, 76, 196, 0.3);
+}
+
+.resumes-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fill, minmax(320px, 1fr));
+
+  gap: 20px;
+}
+
+.resumes-state {
+  padding: 50px;
+
+  text-align: center;
+
+  color: #6b7280;
+}
+
+.resumes-error {
+  padding: 30px;
+
+  border: 1px solid #fecaca;
+  border-radius: 16px;
+
+  text-align: center;
+
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+.resumes-error button {
+  margin-top: 12px;
+
+  padding: 10px 18px;
+
+  border: none;
+  border-radius: 10px;
+
+  color: white;
+  background: #b91c1c;
+
+  cursor: pointer;
+}
+
+.empty-resumes {
+  padding: 70px 30px;
+
+  border: 1px dashed #d1d5db;
+  border-radius: 20px;
+
+  text-align: center;
+
+  background: white;
+}
+
+.empty-resumes h2 {
+  margin: 0;
+
+  color: #1f2937;
+}
+
+.empty-resumes p {
+  margin: 12px 0 24px;
+
+  color: #6b7280;
+}
+
+.empty-resumes .new-resume-button {
+  margin: auto;
+}
+
+@media (max-width: 768px) {
+  .resumes-page {
+    padding: 20px;
+  }
+
+  .resumes-header {
+    flex-direction: column;
+  }
+
+  .new-resume-button {
+    width: 100%;
+  }
+
+  .resumes-grid {
+    grid-template-columns: 1fr;
+  }
+}

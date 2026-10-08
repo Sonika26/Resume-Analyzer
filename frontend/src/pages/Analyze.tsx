@@ -2,6 +2,7 @@ import { useState } from "react";
 import ResumeUploader from "../components/ResumeUploader";
 import apiResume from "../services/apiresume";
 
+
 interface Scores {
   atsScore: number;
   grammarScore: number;
@@ -15,6 +16,7 @@ export default function AnalyzeResume() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [scores, setScores] = useState<Scores | null>(null);
 
+
   const handleAnalyze = async () => {
     if (!resume) return;
 
@@ -25,7 +27,17 @@ export default function AnalyzeResume() {
     formData.append("resume", resume);
 
     try {
-      const response = await apiResume.post("/analyze", formData);
+      const token = localStorage.getItem("token");
+
+      const response = await apiResume.post(
+        "/analyze",
+        formData,
+      {
+         headers: {
+          Authorization: `Bearer ${token}`,
+       },
+      }
+     );
       const result = response.data;
 
       console.log("Analysis Result:", result);

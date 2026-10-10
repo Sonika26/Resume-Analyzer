@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Sparkles, ChevronRight, User, LogOut, LayoutDashboard, FileText, Briefcase, Lightbulb, FilePenLine, WandSparkles, Home } from "lucide-react";
+import { Sparkles, Handshake, ChevronRight, User, LogOut, LayoutDashboard, FileText, Briefcase, FilePenLine, Home } from "lucide-react";
 
 const navItems = [
   {
@@ -13,28 +13,25 @@ const navItems = [
     icon: FileText,
   },
   {
+    name:"Job Match",
+    path:"/jobmatch",
+    icon: Handshake,
+  },
+  {
     name: "Resume",
     path: "/resume",
     icon: Briefcase,
   },
-  {
-    name: "Resume Tips",
-    path: "/tips",
-    icon: Lightbulb,
-  },
+  
   {
     name: "Cover Letter",
     path: "/coverletter",
     icon: FilePenLine,
   },
-  {
-    name: "Resume Rewrite",
-    path: "/resumerewrite",
-    icon: WandSparkles,
-  },
+  
   {
     name: "Home",
-    path: "/home",
+    path: "/",
     icon: Home,
   },
 ];

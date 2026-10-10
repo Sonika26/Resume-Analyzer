@@ -1,0 +1,609 @@
+
+/* =========================================
+   JOB MATCH ANALYZER
+   Dashboard-matched slate & white theme
+========================================= */
+
+.jm-page {
+  min-height: 100vh;
+  background: #f7f8fa;
+  color: #0f172a;
+  font-family: inherit;
+}
+
+.jm-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+/* Header */
+
+.jm-header {
+  margin-bottom: 28px;
+  padding: 28px;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
+}
+
+.jm-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f7f8fa;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.jm-header h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.7px;
+}
+
+.jm-header > p {
+  max-width: 680px;
+  margin: 10px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* Form layout */
+
+.jm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.jm-panel {
+  min-width: 0;
+  padding: 26px;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
+}
+
+/* Section headings */
+
+.jm-section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.jm-step {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.jm-section-heading h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.jm-section-heading p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Upload area
+   These styles apply if your ResumeUpload
+   component uses the corresponding jm classes.
+*/
+
+.jm-upload-area,
+.jm-dropzone {
+  display: flex;
+  min-height: 200px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  text-align: center;
+  transition: 0.2s ease;
+}
+
+.jm-upload-area:hover,
+.jm-dropzone:hover {
+  border-color: #64748b;
+  background: #f1f5f9;
+}
+
+.jm-upload-area h3,
+.jm-dropzone h3 {
+  margin: 12px 0 0;
+  color: #1e293b;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.jm-upload-area p,
+.jm-dropzone p {
+  margin: 7px 0 0;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.jm-file-name {
+  margin-top: 12px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Job description
+   Applies to these class names when used
+   by JobDescriptionForm.
+*/
+
+.jm-textarea,
+.jm-job-description,
+.jm-panel textarea {
+  display: block;
+  width: 100%;
+  min-height: 190px;
+  padding: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  outline: none;
+  background: #ffffff;
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  resize: vertical;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.jm-textarea::placeholder,
+.jm-job-description::placeholder,
+.jm-panel textarea::placeholder {
+  color: #94a3b8;
+}
+
+.jm-textarea:focus,
+.jm-job-description:focus,
+.jm-panel textarea:focus {
+  border-color: #64748b;
+  box-shadow: 0 0 0 3px rgb(100 116 139 / 12%);
+}
+
+.jm-panel label {
+  display: block;
+  margin-bottom: 9px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.jm-char-count {
+  margin-top: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+  text-align: right;
+}
+
+/* Submit button */
+
+.jm-submit {
+  display: inline-flex;
+  width: 100%;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 22px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #0f172a;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 8%);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.jm-submit:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.jm-submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.jm-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Privacy note */
+
+.jm-privacy-note {
+  margin: -8px 0 0;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* Error message */
+
+.jm-error {
+  padding: 14px 16px;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* Loading */
+
+.jm-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 26px;
+  padding: 32px 24px;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.jm-loading p {
+  max-width: 500px;
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.jm-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #334155;
+  border-radius: 50%;
+  animation: jm-spin 0.8s linear infinite;
+}
+
+@keyframes jm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Results container
+   MatchResults may use these class names.
+*/
+
+.jm-results {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-top: 30px;
+}
+
+.jm-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jm-results-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.jm-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.jm-result-card {
+  min-width: 0;
+  padding: 24px;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
+}
+
+.jm-result-card h2,
+.jm-result-card h3 {
+  margin: 0;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.jm-result-card h2 {
+  font-size: 18px;
+}
+
+.jm-result-card h3 {
+  font-size: 15px;
+}
+
+.jm-result-card > p {
+  margin-top: 7px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* Match score */
+
+.jm-score-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 28px;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.jm-score-card h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.jm-score-card p {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.jm-score-circle {
+  display: flex;
+  width: 108px;
+  height: 108px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 8px solid #dbeafe;
+  border-top-color: #2563eb;
+  border-right-color: #2563eb;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+/* Progress bars */
+
+.jm-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.jm-progress-item {
+  min-width: 0;
+}
+
+.jm-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+}
+
+.jm-progress-label {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.jm-progress-value {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.jm-progress-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f1f5f9;
+}
+
+.jm-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #3b82f6;
+  transition: width 0.4s ease;
+}
+
+.jm-progress-fill--green {
+  background: #10b981;
+}
+
+.jm-progress-fill--amber {
+  background: #f59e0b;
+}
+
+.jm-progress-fill--slate {
+  background: #64748b;
+}
+
+/* Skill and keyword tags */
+
+.jm-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.jm-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 11px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.jm-tag--matched {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.jm-tag--missing {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #a16207;
+}
+
+/* Lists and suggestions */
+
+.jm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jm-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.jm-empty {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* Responsive layout */
+
+@media (max-width: 900px) {
+  .jm-container {
+    padding: 24px;
+  }
+
+  .jm-results-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .jm-container {
+    padding: 18px 14px 28px;
+  }
+
+  .jm-header,
+  .jm-panel {
+    padding: 20px;
+  }
+
+  .jm-header h1 {
+    font-size: 24px;
+  }
+
+  .jm-section-heading h2 {
+    font-size: 17px;
+  }
+
+  .jm-score-card {
+    padding: 20px;
+  }
+
+  .jm-score-circle {
+    width: 82px;
+    height: 82px;
+    border-width: 6px;
+    font-size: 21px;
+  }
+
+  .jm-results-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Accessibility */
+
+.jm-page button:focus-visible,
+.jm-page input:focus-visible,
+.jm-page textarea:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jm-page *,
+  .jm-page *::before,
+  .jm-page *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

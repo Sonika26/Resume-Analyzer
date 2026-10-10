@@ -11,7 +11,11 @@ import {
 } from "lucide-react";
 
 import ResumeCard from "../components/ResumeCards";
-import { getResumes, type Resume } from "../services/resume";
+import {
+  getResumes,
+  deleteResume,
+  type Resume,
+} from "../services/resume";
 
 const Resumes = () => {
   const navigate = useNavigate();
@@ -21,12 +25,23 @@ const Resumes = () => {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
-  const handleDelete = (resumeId: string) => {
-  setResumes((prevResumes) =>
-    prevResumes.filter(
-      (resume) => resume._id !== resumeId
-    )
-  );
+ const handleDelete = async (resumeId: string) => {
+  try {
+    await deleteResume(resumeId);
+
+    setResumes((prevResumes) =>
+      prevResumes.filter(
+        (resume) => resume._id !== resumeId
+      )
+    );
+  } catch (error: any) {
+    console.error("Failed to delete resume:", error);
+
+    alert(
+      error?.response?.data?.message ||
+        "Failed to delete resume. Please try again."
+    );
+  }
 };
 
   const fetchResumes = async () => {

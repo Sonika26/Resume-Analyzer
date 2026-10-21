@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Analyze from "./pages/Analyze";
 import Resume from "./pages/Resume";
 import Layout from "./components/Layout";
+import JobMatch from "./pages/JobMatch";
 import ResumeEditor from "./pages/ResumeEditor";
 import CoverLetterPage from "./pages/CoverLetterPage";
 import "./App.css";
@@ -26,6 +27,7 @@ function App() {
          <Route path="/resume/new" element={<ResumeEditor />}/>
          <Route path="/coverletter" element={<CoverLetterPage />} />
       <Route path="/resume/:id/edit"  element={<ResumeEditor />}/>
+      <Route path="/jobmatch" element={<JobMatch />} />
       </Route>
     </Routes>
   );

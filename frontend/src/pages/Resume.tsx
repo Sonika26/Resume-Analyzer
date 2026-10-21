@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Plus,
@@ -11,7 +12,11 @@ import {
 } from "lucide-react";
 
 import ResumeCard from "../components/ResumeCards";
-import { getResumes, type Resume } from "../services/resume";
+import {
+  getResumes,
+  deleteResume,
+  type Resume,
+} from "../services/resume";
 
 const Resumes = () => {
   const navigate = useNavigate();
@@ -21,60 +26,112 @@ const Resumes = () => {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
-  const handleDelete = (resumeId: string) => {
-  setResumes((prevResumes) =>
-    prevResumes.filter(
-      (resume) => resume._id !== resumeId
-    )
-  );
-};
-
-  const fetchResumes = async () => {
+  // Fetch resumes
+  const fetchResumes = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
 
       const data = await getResumes();
       setResumes(data);
-    } catch (error: any) {
-      console.error("Failed to fetch resumes:", error);
+    } catch (err: unknown) {
+      console.error("Failed to fetch resumes:", err);
+
+      const message =
+        err &&
+        typeof err === "object" &&
+        "response" in err
+          ? (
+              err as {
+                response?: {
+                  data?: { message?: string };
+                };
+              }
+            ).response?.data?.message
+          : undefined;
 
       setError(
-        error?.response?.data?.message ||
-        "Failed to load your resumes. Please try again."
+        message ||
+          "Failed to load your resumes. Please try again."
       );
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchResumes();
   }, []);
 
+  useEffect(() => {
+    void fetchResumes();
+  }, [fetchResumes]);
+
+  // Navigate to resume editor
   const handleEdit = (resumeId: string) => {
     navigate(`/resume/${resumeId}/edit`);
   };
 
+  // Create a new resume
   const handleNewResume = () => {
     navigate("/resumes/new");
   };
 
+  // Delete resume
+  const handleDelete = async (resumeId: string) => {
+    try {
+      await deleteResume(resumeId);
+
+      setResumes((previous) =>
+        previous.filter((resume) => resume._id !== resumeId)
+      );
+    } catch (err: unknown) {
+      console.error("Failed to delete resume:", err);
+
+      const message =
+        err &&
+        typeof err === "object" &&
+        "response" in err
+          ? (
+              err as {
+                response?: {
+                  data?: { message?: string };
+                };
+              }
+            ).response?.data?.message
+          : undefined;
+
+      window.alert(
+        message || "Failed to delete resume. Please try again."
+      );
+    }
+  };
+
+  // Update the renamed resume in React state
+  const handleResumeRenamed = (updatedResume: Resume) => {
+  setResumes((previousResumes) =>
+    previousResumes.map((item) =>
+      item._id === updatedResume._id
+        ? { ...item, ...updatedResume }
+        : item
+    )
+  );
+};
+  // Filter resumes by search
   const filteredResumes = resumes.filter((resume) => {
-    if (!search.trim()) {
-        return true;
-      }
+    const query = search.trim().toLowerCase();
 
-      const searchText = search.toLowerCase();
+    if (!query) return true;
 
-      return JSON.stringify(resume)
-      .toLowerCase()
-      .includes(searchText);
+    return [
+      resume.title,
+      resume.originalName,
+      resume.firstName,
+      resume.lastName,
+      resume.jobTitle,
+    ]
+      .filter(Boolean)
+      .some((value) => value!.toLowerCase().includes(query));
   });
 
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-slate-900">
-      {/* Header */}
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-5 py-7 md:px-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -89,252 +146,193 @@ const Resumes = () => {
                 </span>
               </div>
 
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+              <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
                 My Resumes
               </h1>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 md:text-base">
-                Manage your resumes, improve your content, and keep everything
-                ready for your next opportunity.
+                Manage your resumes, improve your content, and keep
+                everything ready for your next opportunity.
               </p>
             </div>
 
             <button
-            onClick={handleNewResume}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 active:scale-[0.98]"
+              type="button"
+              onClick={handleNewResume}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
             >
-            <Plus size={18} />
-            New Resume
-          </button>
+              <Plus size={18} />
+              New Resume
+            </button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    {/* Main */}
-    <main className="mx-auto max-w-7xl px-5 py-7 md:px-8 md:py-9">
-      {/* Stats */}
-      {!loading && !error && (
-        <div className="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Total Resumes
-                </p>
+      <main className="mx-auto max-w-7xl px-5 py-7 md:px-8 md:py-9">
+        {!loading && !error && (
+          <div className="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Total Resumes
+              </p>
+              <p className="mt-2 text-3xl font-bold">
+                {resumes.length}
+              </p>
+            </div>
 
-                <p className="mt-2 text-3xl font-bold text-slate-900">
-                  {resumes.length}
-                </p>
-              </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Ready to Apply
+              </p>
+              <p className="mt-2 text-3xl font-bold">
+                {resumes.length}
+              </p>
+              <Sparkles
+                size={20}
+                className="mt-2 text-emerald-600"
+              />
+            </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100">
-                <FileText size={20} className="text-slate-700" />
-              </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Workspace
+              </p>
+              <p className="mt-2 text-3xl font-bold">Active</p>
+              <Pencil
+                size={20}
+                className="mt-2 text-blue-600"
+              />
             </div>
           </div>
+        )}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Ready to Apply
-                </p>
+        {!loading && !error && resumes.length > 0 && (
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-bold">
+                Your resume collection
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Choose a resume to edit or continue improving.
+              </p>
+            </div>
 
-                <p className="mt-2 text-3xl font-bold text-slate-900">
-                  {resumes.length}
-                </p>
-              </div>
-
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50">
-                <Sparkles size={20} className="text-emerald-600" />
-              </div>
+            <div className="relative w-full sm:w-72">
+              <Search
+                size={17}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                type="text"
+                placeholder="Search resumes..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm outline-none focus:border-slate-400"
+              />
             </div>
           </div>
+        )}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Workspace
-                </p>
+        {loading && (
+          <div className="flex min-h-64 items-center justify-center">
+            <RefreshCw
+              size={28}
+              className="animate-spin text-slate-500"
+            />
+            <span className="ml-3 text-slate-500">
+              Loading resumes...
+            </span>
+          </div>
+        )}
 
-                <p className="mt-2 text-3xl font-bold text-slate-900">
-                  Active
-                </p>
-              </div>
+        {!loading && error && (
+          <div className="mx-auto max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center">
+            <h2 className="text-lg font-bold">
+              Unable to load your resumes
+            </h2>
+            <p className="mt-2 text-sm text-slate-500">{error}</p>
+            <button
+              type="button"
+              onClick={() => void fetchResumes()}
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white"
+            >
+              <RefreshCw size={16} />
+              Try Again
+            </button>
+          </div>
+        )}
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50">
-                <Pencil size={20} className="text-blue-600" />
-              </div>
+        {!loading && !error && resumes.length === 0 && (
+          <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center">
+            <FileText
+              size={32}
+              className="mx-auto text-slate-500"
+            />
+            <h2 className="mt-6 text-2xl font-bold">
+              Create your first resume
+            </h2>
+            <p className="mt-3 text-sm text-slate-500">
+              Create a professional resume and keep everything
+              organized in one place.
+            </p>
+
+            <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={handleNewResume}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white"
+              >
+                <Plus size={17} />
+                Create Resume
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate("/analyze")}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold"
+              >
+                <Upload size={17} />
+                Upload Resume
+              </button>
             </div>
           </div>
-        </div>
-    )}
+        )}
 
-    {/* Toolbar */}
-    {!loading && !error && resumes.length > 0 && (
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900">
-            Your resume collection
-          </h2>
-
-          <p className="mt-1 text-sm text-slate-500">
-            Choose a resume to edit or continue improving.
-          </p>
-        </div>
-
-        <div className="relative w-full sm:w-72">
-          <Search
-          size={17}
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-          />
-
-          <input
-          type="text"
-          placeholder="Search resumes..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-          />
-        </div>
-      </div>
-  )}
-
-  {/* Loading */}
-  {loading && (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-      {[1, 2, 3].map((item) => (
-        <div
-        key={item}
-        className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
-        >
-        <div className="h-2 animate-pulse bg-slate-200" />
-
-        <div className="p-6">
-          <div className="mb-5 flex items-center justify-between">
-            <div className="h-11 w-11 animate-pulse rounded-xl bg-slate-100" />
-            <div className="h-8 w-8 animate-pulse rounded-lg bg-slate-100" />
-          </div>
-
-          <div className="h-5 w-2/3 animate-pulse rounded bg-slate-100" />
-
-          <div className="mt-3 h-4 w-full animate-pulse rounded bg-slate-100" />
-
-          <div className="mt-2 h-4 w-4/5 animate-pulse rounded bg-slate-100" />
-
-          <div className="mt-7 h-10 w-full animate-pulse rounded-xl bg-slate-100" />
-        </div>
-      </div>
-))}
-</div>
-)}
-
-{/* Error */}
-{!loading && error && (
-  <div className="flex min-h-[400px] items-center justify-center">
-    <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
-        <RefreshCw size={22} className="text-red-500" />
-      </div>
-
-      <h2 className="mt-5 text-lg font-bold text-slate-900">
-        Unable to load your resumes
-      </h2>
-
-      <p className="mt-2 text-sm leading-6 text-slate-500">
-        {error}
-      </p>
-
-      <button
-      onClick={fetchResumes}
-      className="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
-      >
-      <RefreshCw size={16} />
-      Try Again
-    </button>
-  </div>
-</div>
-)}
-
-{/* Empty */}
-{!loading && !error && resumes.length === 0 && (
-  <div className="flex min-h-[500px] items-center justify-center">
-    <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm md:p-12">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 shadow-sm">
-        <FileText size={28} className="text-white" />
-      </div>
-
-      <h2 className="mt-6 text-2xl font-bold tracking-tight text-slate-900">
-        Create your first resume
-      </h2>
-
-      <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-500">
-        You don't have any resumes yet. Create a professional resume
-        and keep everything organized in one place.
-      </p>
-
-      <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-        <button
-        onClick={handleNewResume}
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-        >
-        <Plus size={17} />
-        Create Resume
-      </button>
-
-      <button
-      onClick={() => navigate("/analyze")}
-      className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-      >
-      <Upload size={17} />
-      Upload Resume
-    </button>
-  </div>
-</div>
-</div>
-)}
-
-{/* Resume Grid */}
-{!loading && !error && resumes.length > 0 && (
-  <>
-  {filteredResumes.length > 0 ? (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-      {filteredResumes.map((resume) => (
-        <div
-        key={resume._id}
-        className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg"
-        >
-       <ResumeCard
-        key={resume._id}
-        resume={resume}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-       />
-      </div>
-))}
-</div>
-) : (
-  <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
-    <Search
-    size={28}
-    className="mx-auto text-slate-300"
-    />
-
-    <h3 className="mt-4 text-lg font-bold text-slate-900">
-      No resumes found
-    </h3>
-
-    <p className="mt-2 text-sm text-slate-500">
-      Try searching with a different resume name.
-    </p>
-  </div>
-)}
-</>
-)}
-</main>
-</div>
-);
+        {!loading && !error && resumes.length > 0 && (
+          filteredResumes.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {filteredResumes.map((resume) => (
+                <div
+                  key={resume._id}
+                  className="group relative overflow-visible rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <ResumeCard
+                    resume={resume}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onRenamed={handleResumeRenamed}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
+              <Search
+                size={28}
+                className="mx-auto text-slate-400"
+              />
+              <h3 className="mt-4 text-lg font-bold">
+                No resumes found
+              </h3>
+              <p className="mt-2 text-sm text-slate-500">
+                Try searching with a different resume name.
+              </p>
+            </div>
+          )
+        )}
+      </main>
+    </div>
+  );
 };
 
 export default Resumes;

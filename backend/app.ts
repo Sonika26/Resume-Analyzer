@@ -5,6 +5,8 @@ import authRoutes from "./routes/authroutes";
 import resumeRoutes from "./routes/resumeroutes"
 import dashboardRoutes from "./routes/dashboardroute"
 import coverLetterRoutes from "./routes/coverLetter";
+import jobMatchRoutes from "./routes/jobMatchRoutes";
+
 
 
 
@@ -18,8 +20,10 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/resume" , resumeRoutes);
-app.use("/api/coverletter", coverLetterRoutes);
+app.use("/api/cover-letter", coverLetterRoutes);
 app.use("/",dashboardRoutes );
+
+app.use("/api/job-match", jobMatchRoutes);
 
 // Route
 app.get("/api/message", (req: Request, res: Response) => {

@@ -1,480 +1,334 @@
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { NavLink } from "react-router-dom";
+import type { LucideIcon } from "lucide-react";
+import {
+  ArrowRight,
+  Briefcase,
+  FileSearch,
+  LayoutTemplate,
+  SpellCheck,
+  WandSparkles,
+} from "lucide-react";
 import Navbar from "../components/Navbar";
 import api from "../services/api";
+
+/* ============================ Types ============================ */
+
 interface User {
   fullName: string;
   email?: string;
 }
+
+/* ========================== Page content ======================= */
+
+const FEATURES: { icon: LucideIcon; title: string; text: string }[] = [
+  {
+    icon: FileSearch,
+    title: "ATS compatibility",
+    text: "Checks that recruiter software can read your sections, dates and keywords, so your resume isn't filtered out before a person sees it.",
+  },
+  {
+    icon: SpellCheck,
+    title: "Grammar and writing",
+    text: "Finds spelling mistakes, tense slips and weak phrasing, like bullets that start with \u201cResponsible for\u201d instead of what you achieved.",
+  },
+  {
+    icon: LayoutTemplate,
+    title: "Formatting and structure",
+    text: "Flags inconsistent fonts, cluttered spacing and missing sections that make a resume harder to skim.",
+  },
+  {
+    icon: WandSparkles,
+    title: "AI rewrite",
+    text: "Turn the issues we find into improved wording you can copy straight into your resume.",
+  },
+  {
+    icon: Briefcase,
+    title: "Job matches",
+    text: "See roles that fit your skills and experience, based on your analyzed resume.",
+  },
+];
+
+const STEPS = [
+  { title: "Upload your resume", text: "Add the version you currently send to employers." },
+  { title: "Read your scores", text: "Get an overall score plus ATS, grammar and formatting results, with each issue pointed out." },
+  { title: "Fix and check again", text: "Apply the suggestions, upload again and watch your score change." },
+];
+
+const SAMPLE_FINDINGS: { tone: "amber" | "red" | "green"; text: string }[] = [
+  { tone: "amber", text: "Start this bullet with an action verb, like \u201cLed\u201d." },
+  { tone: "red", text: "Spelling: \u201crecieve\u201d should be \u201creceive\u201d." },
+  { tone: "green", text: "Strong result. Numbers make bullets credible." },
+];
+
+const TONE_DOT: Record<"amber" | "red" | "green", string> = {
+  amber: "bg-amber-400",
+  red: "bg-red-500",
+  green: "bg-emerald-500",
+};
+
+/* ============================ Page ============================= */
 
 function Home() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) return;
 
+    let cancelled = false;
     api
-      .get("/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      .get("/me", { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => {
+        if (!cancelled) setUser(res.data.user);
       })
-      .then((response) => {
-        setUser(response.data.user);
-      })
-      .catch((err) => {
-        console.error("Error fetching user:", err);
-      });
+      .catch((err) => console.error("Error fetching user:", err));
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const firstName = user?.fullName?.trim().split(" ")[0];
 
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-slate-900">
       <Navbar />
 
-      <main className="relative overflow-hidden px-4 pb-16 pt-32 sm:px-6 lg:px-8">
-
-        {/* ================================================== */}
-        {/* BACKGROUND DECORATION */}
-        {/* ================================================== */}
-
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-
-          {/* Top glow */}
-          <div className="absolute -top-40 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-slate-200/60 blur-3xl" />
-
-          {/* Left glow */}
-          <div className="absolute left-[-120px] top-40 h-72 w-72 rounded-full bg-blue-100/40 blur-3xl" />
-
-          {/* Right glow */}
-          <div className="absolute right-[-120px] top-60 h-72 w-72 rounded-full bg-slate-200/50 blur-3xl" />
-
-        </div>
-
-
-        {/* ================================================== */}
-        {/* HERO */}
-        {/* ================================================== */}
-
-        <section className="relative mx-auto max-w-5xl text-center">
-
-          {/* Badge */}
-          <div
-            className="
-              mx-auto
-              inline-flex
-              items-center
-              gap-2
-              rounded-full
-              border
-              border-slate-200
-              bg-white
-              px-4
-              py-1.5
-              text-[11px]
-              font-semibold
-              text-slate-600
-              shadow-sm
-            "
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-slate-500" />
-
-            AI-powered resume analysis
-          </div>
-
-
-          {/* Heading */}
-          <h1
-            className="
-              mx-auto
-              mt-6
-              max-w-4xl
-              text-4xl
-              font-bold
-              tracking-[-0.045em]
-              text-slate-900
-              sm:text-5xl
-              lg:text-6xl
-              lg:leading-[1.05]
-            "
-          >
-            Build a resume that
-            <span className="block text-slate-500">
-              gets noticed.
-            </span>
-          </h1>
-
-
-          {/* Description */}
-          <p
-            className="
-              mx-auto
-              mt-5
-              max-w-2xl
-              text-sm
-              leading-7
-              text-slate-500
-              sm:text-base
-            "
-          >
-            Analyze your resume for ATS compatibility, grammar,
-            formatting, and overall quality — all in one place.
-          </p>
-
-
-          {/* ================================================== */}
-          {/* USER WELCOME */}
-          {/* ================================================== */}
-
-          <div className="mt-7">
-
-            {user ? (
-              <div
-                className="
-                  mx-auto
-                  inline-flex
-                  items-center
-                  gap-3
-                  rounded-xl
-                  border
-                  border-slate-200
-                  bg-white
-                  px-4
-                  py-3
-                  shadow-sm
-                "
-              >
-                {/* Avatar */}
-                <div
-                  className="
-                    flex
-                    h-9
-                    w-9
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-slate-900
-                    text-sm
-                    font-bold
-                    text-white
-                  "
+      <main>
+        {/* ======================= HERO ======================= */}
+        <section className="mx-auto grid max-w-6xl items-center gap-14 px-4 pb-20 pt-28 sm:px-6 sm:pt-32 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:px-8 lg:pb-28">
+          <div>
+            {firstName && (
+              <p className="mb-5 text-sm font-medium text-slate-500">
+                Welcome back, {firstName}.{" "}
+                <NavLink
+                  to="/dashboard"
+                  className="font-semibold text-indigo-600 underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-600"
                 >
-                  {user.fullName?.charAt(0)?.toUpperCase() || "U"}
-                </div>
-
-                <div className="text-left">
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
-                    Welcome back
-                  </p>
-
-                  <p className="text-sm font-bold text-slate-800">
-                    {user.fullName}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm font-medium text-slate-400">
-                Sign in to get started with your resume analysis.
+                  Open your dashboard
+                </NavLink>
               </p>
             )}
 
-          </div>
+            <h1 className="max-w-xl text-4xl font-bold tracking-[-0.035em] text-slate-900 sm:text-5xl lg:text-[3.5rem] lg:leading-[1.05]">
+              Find out why your resume isn't getting replies.
+            </h1>
 
-        </section>
+            <p className="mt-5 max-w-lg text-base leading-7 text-slate-600">
+              Upload your resume and get scored on ATS compatibility, grammar and formatting, with a specific fix for
+              every issue we find.
+            </p>
 
-
-        {/* ================================================== */}
-        {/* FEATURE CARDS */}
-        {/* ================================================== */}
-
-        <section className="relative mx-auto mt-14 max-w-5xl">
-
-          <div className="grid gap-4 sm:grid-cols-3">
-
-            {/* ATS */}
-            <FeatureCard
-              number="01"
-              title="ATS Analysis"
-              description="See how well your resume performs against applicant tracking systems."
-            />
-
-            {/* Grammar */}
-            <FeatureCard
-              number="02"
-              title="Grammar & Writing"
-              description="Find grammar, spelling, and writing issues that could weaken your resume."
-            />
-
-            {/* Formatting */}
-            <FeatureCard
-              number="03"
-              title="Formatting"
-              description="Check structure, organization, and formatting for a cleaner resume."
-            />
-
-          </div>
-
-        </section>
-
-
-        {/* ================================================== */}
-        {/* MAIN CTA */}
-        {/* ================================================== */}
-
-        <section className="relative mx-auto mt-6 max-w-5xl">
-
-          <div
-            className="
-              overflow-hidden
-              rounded-2xl
-              border
-              border-slate-200
-              bg-white
-              shadow-[0_10px_40px_rgba(15,23,42,0.06)]
-            "
-          >
-
-            <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
-
-              {/* CTA content */}
-              <div className="p-7 sm:p-9">
-
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Resume Intelligence
-                </p>
-
-                <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
-                  Know exactly what to improve.
-                </h2>
-
-                <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
-                  Get a clear breakdown of your resume performance and
-                  actionable suggestions to help make it stronger.
-                </p>
-
-                <a
-                  href="/analyze"
-                  className="
-                    mt-6
-                    inline-flex
-                    items-center
-                    justify-center
-                    rounded-xl
-                    bg-slate-900
-                    px-5
-                    py-3
-                    text-sm
-                    font-bold
-                    text-white
-                    shadow-[0_6px_18px_rgba(15,23,42,0.16)]
-                    transition-all
-                    duration-300
-                    hover:-translate-y-0.5
-                    hover:bg-slate-800
-                    hover:shadow-[0_10px_25px_rgba(15,23,42,0.22)]
-                  "
-                >
-                  Analyze My Resume
-                </a>
-
-              </div>
-
-
-              {/* Score preview */}
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-center
-                  border-t
-                  border-slate-200
-                  bg-slate-50/70
-                  p-7
-                  lg:border-l
-                  lg:border-t-0
-                "
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <NavLink
+                to="/analyze"
+                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
+                Analyze my resume
+                <ArrowRight size={16} />
+              </NavLink>
 
-                <div className="w-full max-w-xs">
+              <a
+                href="#how-it-works"
+                className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                See how it works
+              </a>
+            </div>
+          </div>
 
-                  <div className="mb-4 flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-bold text-slate-800">
-                        Resume Score
-                      </p>
+          <ResumePreview />
+        </section>
 
-                      <p className="mt-0.5 text-[10px] text-slate-400">
-                        Example analysis
-                      </p>
-                    </div>
-
-                    <span className="text-2xl font-bold text-slate-900">
-                      84
-                    </span>
-                  </div>
-
-
-                  <div className="space-y-3">
-
-                    <HomeScoreBar
-                      title="ATS"
-                      score={88}
-                    />
-
-                    <HomeScoreBar
-                      title="Grammar"
-                      score={82}
-                    />
-
-                    <HomeScoreBar
-                      title="Formatting"
-                      score={81}
-                    />
-
-                  </div>
-
-                </div>
-
-              </div>
-
+        {/* ===================== FEATURES ===================== */}
+        <section className="border-y border-slate-200 bg-white">
+          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:px-8">
+            <div className="lg:sticky lg:top-28 lg:self-start">
+              <h2 className="text-3xl font-bold tracking-tight">One review, every angle.</h2>
+              <p className="mt-4 max-w-sm text-sm leading-6 text-slate-600">
+                Most resumes fail for small, fixable reasons. We check the things recruiters and screening software
+                notice first.
+              </p>
             </div>
 
+            <ul className="divide-y divide-slate-200 border-y border-slate-200">
+              {FEATURES.map(({ icon: Icon, title, text }) => (
+                <li key={title} className="flex gap-5 py-6">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                    <Icon size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-900">{title}</h3>
+                    <p className="mt-1.5 max-w-xl text-sm leading-6 text-slate-600">{text}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
-
         </section>
 
+        {/* ==================== HOW IT WORKS ==================== */}
+        <section id="how-it-works" className="mx-auto max-w-6xl scroll-mt-24 px-4 py-20 sm:px-6 lg:px-8">
+          <h2 className="max-w-md text-3xl font-bold tracking-tight">From upload to better resume in three steps.</h2>
 
-        {/* ================================================== */}
-        {/* BOTTOM TEXT */}
-        {/* ================================================== */}
-
-        <section className="relative mx-auto mt-10 max-w-2xl text-center">
-
-          <p className="text-xs leading-5 text-slate-400">
-            Built to help job seekers understand and improve their resumes
-            before applying.
-          </p>
-
+          <ol className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
+            {STEPS.map((step, i) => (
+              <li key={step.title} className="relative">
+                {i < STEPS.length - 1 && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute left-12 right-[-1rem] top-5 hidden h-px bg-slate-300 md:block"
+                  />
+                )}
+                <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white">
+                  {i + 1}
+                </span>
+                <h3 className="mt-5 font-semibold text-slate-900">{step.title}</h3>
+                <p className="mt-1.5 max-w-xs text-sm leading-6 text-slate-600">{step.text}</p>
+              </li>
+            ))}
+          </ol>
         </section>
 
+        {/* ======================= FINAL CTA ======================= */}
+        <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-start justify-between gap-8 rounded-3xl bg-slate-900 p-8 sm:p-12 md:flex-row md:items-center">
+            <div className="max-w-xl">
+              <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                Your next application deserves a stronger resume.
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                It takes a minute to see where your resume stands and what to change first.
+              </p>
+            </div>
+
+            <NavLink
+              to="/analyze"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              Analyze my resume
+              <ArrowRight size={16} />
+            </NavLink>
+          </div>
+        </section>
       </main>
+
+      <footer className="border-t border-slate-200 bg-white">
+        <p className="mx-auto max-w-6xl px-4 py-6 text-xs text-slate-400 sm:px-6 lg:px-8">
+          Built to help job seekers understand and improve their resumes before applying.
+        </p>
+      </footer>
     </div>
   );
 }
 
+/* ================== Hero: marked-up resume ===================== */
 
-/* ================================================== */
-/* FEATURE CARD */
-/* ================================================== */
-
-function FeatureCard({
-  number,
-  title,
-  description,
-}: {
-  number: string;
-  title: string;
-  description: string;
-}) {
+// A sample resume with reviewer-style marks. This is the one memorable visual on the page.
+function ResumePreview() {
   return (
-    <div
-      className="
-        group
-        rounded-2xl
-        border
-        border-slate-200
-        bg-white
-        p-5
-        shadow-[0_5px_25px_rgba(15,23,42,0.04)]
-        transition-all
-        duration-300
-        hover:-translate-y-1
-        hover:border-slate-300
-        hover:shadow-[0_12px_35px_rgba(15,23,42,0.08)]
-      "
-    >
-
-      <div className="flex items-center justify-between">
-
-        <span
-          className="
-            flex
-            h-8
-            w-8
-            items-center
-            justify-center
-            rounded-lg
-            bg-slate-100
-            text-[10px]
-            font-bold
-            text-slate-500
-          "
-        >
-          {number}
-        </span>
-
+    <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+      <div className="absolute -right-3 -top-4 z-10 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white py-2.5 pl-3 pr-4 shadow-lg">
+        <ScoreRing score={84} />
+        <div>
+          <p className="text-sm font-bold text-slate-900">Overall score</p>
+          <p className="text-xs text-slate-500">Example report</p>
+        </div>
       </div>
 
+      <div className="rounded-2xl border border-slate-200 bg-white p-7 pt-12 shadow-[0_20px_60px_rgba(15,23,42,0.10)] sm:p-9 sm:pt-14">
+        <p className="text-xl font-bold text-slate-900">Alex Morgan</p>
+        <p className="mt-0.5 text-sm text-slate-500">Product Designer</p>
 
-      <h3 className="mt-5 text-sm font-bold text-slate-900">
-        {title}
-      </h3>
+        <div className="mt-6 border-t border-slate-100 pt-5">
+          <p className="text-sm font-semibold text-slate-800">Senior Designer, Northwind</p>
+          <p className="text-xs text-slate-400">2021 to present</p>
 
-      <p className="mt-2 text-xs leading-5 text-slate-500">
-        {description}
-      </p>
+          <ul className="mt-4 space-y-3 text-[13px] leading-6 text-slate-700">
+            <li className="flex gap-2.5">
+              <Dot />
+              <span>
+                <Mark tone="amber">Responsible for</Mark> redesigning the onboarding flow, which{" "}
+                <Mark tone="green">increased activation by 23%</Mark>.
+              </span>
+            </li>
+            <li className="flex gap-2.5">
+              <Dot />
+              <span>
+                Ran research sessions to{" "}
+                <span className="underline decoration-red-500 decoration-wavy underline-offset-4">recieve</span>{" "}
+                feedback from 40+ customers each quarter.
+              </span>
+            </li>
+            <li className="flex gap-2.5">
+              <Dot />
+              <span className="flex-1 space-y-2 pt-2" aria-hidden="true">
+                <span className="block h-2 w-full rounded bg-slate-100" />
+                <span className="block h-2 w-2/3 rounded bg-slate-100" />
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
 
+      <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-lg lg:absolute lg:-bottom-10 lg:-left-8 lg:mt-0 lg:w-72">
+        <p className="text-xs font-semibold text-slate-500">What we found</p>
+        <ul className="mt-3 space-y-2.5">
+          {SAMPLE_FINDINGS.map((f) => (
+            <li key={f.text} className="flex items-start gap-2.5 text-xs leading-5 text-slate-700">
+              <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${TONE_DOT[f.tone]}`} />
+              {f.text}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
 
+function Dot() {
+  return <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />;
+}
 
-/* ================================================== */
-/* SCORE BAR */
-/* ================================================== */
+function Mark({ tone, children }: { tone: "amber" | "green"; children: ReactNode }) {
+  const bg = tone === "amber" ? "bg-amber-200/70" : "bg-emerald-200/70";
+  return <mark className={`rounded px-0.5 text-inherit ${bg}`}>{children}</mark>;
+}
 
-function HomeScoreBar({
-  title,
-  score,
-}: {
-  title: string;
-  score: number;
-}) {
+// Animates from empty to the score once on load. Respects reduced motion.
+function ScoreRing({ score }: { score: number }) {
+  const [filled, setFilled] = useState(false);
+  const radius = 20;
+  const circumference = 2 * Math.PI * radius;
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setFilled(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   return (
-    <div>
-
-      <div className="mb-1.5 flex items-center justify-between">
-
-        <span className="text-[10px] font-semibold text-slate-500">
-          {title}
-        </span>
-
-        <span className="text-[10px] font-bold text-slate-700">
-          {score}
-        </span>
-
-      </div>
-
-      <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
-
-        <div
-          className="
-            h-full
-            rounded-full
-            bg-slate-900
-            transition-all
-            duration-700
-          "
-          style={{
-            width: `${score}%`,
-          }}
+    <div className="relative h-14 w-14 shrink-0">
+      <svg viewBox="0 0 48 48" className="h-full w-full -rotate-90" aria-hidden="true">
+        <circle cx="24" cy="24" r={radius} fill="none" strokeWidth="5" className="stroke-slate-100" />
+        <circle
+          cx="24"
+          cy="24"
+          r={radius}
+          fill="none"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={filled ? circumference * (1 - score / 100) : circumference}
+          className="stroke-indigo-600 transition-[stroke-dashoffset] duration-1000 ease-out motion-reduce:transition-none"
         />
-
-      </div>
-
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-slate-900">
+        {score}
+      </span>
     </div>
   );
 }
-
 
 export default Home;

@@ -12,6 +12,11 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
+console.log(
+  "Gemini API key loaded:",
+  Boolean(process.env.GEMINI_API_KEY)
+);
+
 export const generateCoverLetter = async (
   jobDescription: string
 ): Promise<string> => {
@@ -25,7 +30,7 @@ ${userPrompt}
 `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.5-flash-lite",
       contents: prompt,
     });
 

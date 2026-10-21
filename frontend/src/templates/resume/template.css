@@ -856,14 +856,14 @@
 
 .modern-template {
   padding: 0;
-  font-size: 12.5px;
+  font-size: 12px; /* base size slightly larger */
   color: #20242a;
 }
 
 /* ================= HEADER ================= */
 
 .modern-header {
-  padding: 44px 48px 28px;
+  padding: 44px 48px 20px; /* reduced bottom padding */
   border-bottom: 1px solid #d8dce1;
 }
 
@@ -876,15 +876,15 @@
 
 .modern-header h1 {
   margin: 0;
-  font-size: 35px;
-  line-height: 1.05;
+  font-size: 32px; /* was 35px */
+  line-height: 1.1;
   font-weight: 700;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
 }
 
 .modern-header h2 {
   margin: 9px 0 0;
-  font-size: 15px;
+  font-size: 16px; /* was 15px */
   line-height: 1.4;
   font-weight: 500;
   color: #68707a;
@@ -897,7 +897,7 @@
   gap: 4px;
   padding-top: 3px;
   color: #555d67;
-  font-size: 10.5px;
+  font-size: 11px; /* was 10.5px */
   text-align: right;
 }
 
@@ -909,7 +909,7 @@
 
 .modern-links a {
   color: #20242a;
-  font-size: 10.5px;
+  font-size: 11px; /* was 10.5px */
   font-weight: 600;
   text-decoration: none;
 }
@@ -919,7 +919,7 @@
 .modern-section {
   display: grid;
   grid-template-columns: 125px 1fr;
-  gap: 25px;
+  gap: 20px; /* was 25px */
   padding: 23px 48px 0;
 }
 
@@ -931,7 +931,7 @@
 
 .modern-section-number {
   color: #8a9199;
-  font-size: 9px;
+  font-size: 10px; /* was 9px */
   font-weight: 700;
   letter-spacing: 0.5px;
   padding-top: 2px;
@@ -939,11 +939,11 @@
 
 .modern-section-heading h3 {
   margin: 0;
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 12.5px; /* was 11px */
+  line-height: 1.35;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.1px;
+  letter-spacing: 1px;
 }
 
 .modern-section-content {
@@ -953,8 +953,8 @@
 .modern-section-content > p {
   margin: 0;
   color: #4f5760;
-  font-size: 11.5px;
-  line-height: 1.7;
+  font-size: 11.5px; /* unified body text */
+  line-height: 1.65;
   white-space: pre-line;
 }
 
@@ -975,7 +975,7 @@
   display: flex;
   flex-direction: column;
   color: #777f88;
-  font-size: 9.5px;
+  font-size: 10px; /* was 9.5px */
   line-height: 1.5;
 }
 
@@ -997,14 +997,14 @@
 .modern-company {
   margin-top: 3px;
   color: #626a74;
-  font-size: 11px;
+  font-size: 11.5px; /* was 11px */
   font-weight: 600;
 }
 
 .modern-experience-body p {
   margin: 7px 0 0;
   color: #4f5760;
-  font-size: 11px;
+  font-size: 11.5px; /* unified body text */
   line-height: 1.65;
   white-space: pre-line;
 }
@@ -1030,13 +1030,13 @@
   display: block;
   margin-top: 2px;
   color: #727a84;
-  font-size: 10.5px;
+  font-size: 11px; /* was 10.5px */
 }
 
 .modern-project-top a {
   flex-shrink: 0;
   color: #343a40;
-  font-size: 9.5px;
+  font-size: 10px; /* was 9.5px */
   font-weight: 600;
   text-decoration: none;
 }
@@ -1044,13 +1044,13 @@
 .modern-technologies {
   margin-top: 5px;
   color: #737b84;
-  font-size: 9.5px;
+  font-size: 10px; /* was 9.5px */
 }
 
 .modern-project p {
   margin: 6px 0 0;
   color: #4f5760;
-  font-size: 11px;
+  font-size: 11.5px;
   line-height: 1.6;
   white-space: pre-line;
 }
@@ -1065,11 +1065,11 @@
 
 .modern-skill {
   padding: 5px 9px;
-  border: 1px solid #d6d9dd;
+  border: 1px solid #cfd3d8; /* slightly darker border */
   border-radius: 3px;
   color: #414850;
-  font-size: 9.5px;
-  line-height: 1;
+  font-size: 10.5px; /* was 9.5px */
+  line-height: 1.2;
 }
 
 /* ================= EDUCATION ================= */
@@ -1087,7 +1087,7 @@
 
 .modern-education-date {
   color: #777f88;
-  font-size: 9.5px;
+  font-size: 10px; /* was 9.5px */
   line-height: 1.5;
 }
 
@@ -1095,13 +1095,13 @@
   display: block;
   margin-top: 3px;
   color: #626a74;
-  font-size: 10.5px;
+  font-size: 11px; /* was 10.5px */
 }
 
 .modern-education p {
   margin: 6px 0 0;
   color: #4f5760;
-  font-size: 11px;
+  font-size: 11.5px;
   line-height: 1.6;
   white-space: pre-line;
 }
@@ -1121,13 +1121,13 @@
 
 .modern-achievement-marker {
   padding-top: 2px;
-  font-size: 7px;
+  font-size: 8px; /* was 7px */
 }
 
 .modern-achievement-meta {
   margin-top: 3px;
   color: #727a84;
-  font-size: 10px;
+  font-size: 10.5px; /* was 10px */
 }
 
 .modern-achievement-meta strong {
@@ -1137,7 +1137,7 @@
 .modern-achievement p {
   margin: 5px 0 0;
   color: #4f5760;
-  font-size: 11px;
+  font-size: 11.5px;
   line-height: 1.6;
   white-space: pre-line;
 }
@@ -1160,6 +1160,7 @@
     break-inside: avoid;
   }
 }
+
 
 /* =========================================================
    MINIMAL TEMPLATE

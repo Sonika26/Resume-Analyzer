@@ -19,7 +19,7 @@ export default function Navbar() {
   const links = [
     { name: "Home", href: "/" },
     { name: "Analyze Resume", href: "/analyze" },
-    { name: "Job Match", href: "/jobs" },
+    { name: "Job Match", href: "/jobmatch" },
     { name: "Resume Tips", href: "/tips" },
   ];
 

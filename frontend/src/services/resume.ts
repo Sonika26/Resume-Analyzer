@@ -155,9 +155,28 @@ export const uploadResume = async (
   return response.data.data.resume;
 };
 
+
+
+/**
+ * Rename an existing resume.
+ */
+export const renameResume = async (
+  resumeId: string,
+  title: string
+): Promise<Resume> => {
+  const response = await axios.put<ResumeResponse>(
+    `${API_URL}/resume/${resumeId}`,
+    { title },
+    getAuthHeaders()
+  );
+
+  return response.data.data;
+};
+
 /**
  * Delete a resume.
  */
+
 export const deleteResume = async (
   resumeId: string
 ): Promise<string> => {
@@ -217,4 +236,31 @@ export const downloadResumePdf = async (
   );
 
   return response.data;
+};
+export const downloadResumePdf2 = async (
+  resumeId: string
+): Promise<void> => {
+  const response = await axios.get(
+    `${API_URL}/resume/${resumeId}/download`,
+    {
+      ...getAuthHeaders(),
+      responseType: "blob",
+    }
+  );
+
+  const blob = new Blob([response.data], {
+    type: "application/pdf",
+  });
+
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "My_Resume.pdf";
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.URL.revokeObjectURL(url);
 };

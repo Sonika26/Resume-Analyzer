@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import Resume from "../models/resume";
+import dashboardActivities from "./dashboardActivities";
 
 const router = Router();
 
@@ -29,8 +30,7 @@ router.get(
           overallScore: latestResume.analysis?.overallScore ?? 0,
           atsScore: latestResume.analysis?.atsScore ?? 0,
           grammarScore: latestResume.analysis?.grammarScore ?? 0,
-          formattingScore:
-            latestResume.analysis?.formattingScore ?? 0,
+          formattingScore: latestResume.analysis?.formattingScore ?? 0,
         },
       });
     } catch (error) {
@@ -42,5 +42,9 @@ router.get(
     }
   }
 );
+
+// Adds GET /dashboard/activities under the same prefix as /dashboard,
+// so you don't need to touch your server file.
+router.use(dashboardActivities);
 
 export default router;
